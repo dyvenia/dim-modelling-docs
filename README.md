@@ -72,6 +72,73 @@ mdBook's file-watcher can miss edits when the project lives on a Windows mount
 - move the project into the Linux filesystem (e.g. `~/dim-modelling-docs`) where
   the watcher is reliable.
 
+## Deployment
+
+### Docs site (mdBook) → GitHub Pages
+
+A workflow at [.github/workflows/deploy-docs.yml](.github/workflows/deploy-docs.yml)
+builds the book and publishes it on every push to `main`. It installs the same
+`mdbook` (0.5.3) and `mdbook-mermaid` (0.17.0) binaries used locally, runs
+`mdbook build`, and deploys `book/` via GitHub Pages.
+
+One-time setup (repo admin): **Settings → Pages → Build and deployment → Source:
+GitHub Actions**. After that, pushes to `main` deploy automatically; the live URL
+appears in the workflow run and under Settings → Pages.
+
+To deploy to **any other static host** (Netlify, S3, Cloudflare Pages, nginx),
+just build and upload the output directory:
+
+```bash
+mdbook build          # produces ./book
+# then serve / upload the contents of ./book as static files
+```
+
+> The bump from version-pinned binaries in CI keeps deploys reproducible. If you
+> upgrade mdBook/mdbook-mermaid locally, bump `MDBOOK_VERSION` /
+> `MDBOOK_MERMAID_VERSION` in the workflow to match.
+
+### MCP server (`mcp-server/server.py`)
+
+The server picks its transport from environment variables, so the same file runs
+locally over stdio or remotely over HTTP:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `MCP_TRANSPORT` | `stdio` | `stdio` for desktop clients, `http` for a remote service. |
+| `MCP_HOST` | `0.0.0.0` | Bind address (HTTP only). |
+| `MCP_PORT` | `8000` | Port (HTTP only). |
+| `DOCS_SRC` | `../src` | Path to the docs the server reads. |
+
+**Local (stdio)** — the usual case; the client launches it. See
+[mcp-server/README.md](mcp-server/README.md) for client config.
+
+**Remote (HTTP)** — run it as a long-lived service:
+
+```bash
+cd mcp-server
+MCP_TRANSPORT=http MCP_PORT=8000 uv run server.py
+# reachable at http://<host>:8000/mcp
+```
+
+**Docker** — build from the repo root (so the docs are included) using
+[mcp-server/Dockerfile](mcp-server/Dockerfile):
+
+```bash
+docker build -f mcp-server/Dockerfile -t dim-docs-mcp .
+docker run -p 8000:8000 dim-docs-mcp        # http://localhost:8000/mcp
+```
+
+**Connect a client to the deployed HTTP server:**
+
+```bash
+claude mcp add --transport http dim-modelling-docs https://<host>/mcp
+```
+
+> Keep it alive in production with your process manager of choice (systemd,
+> Docker `--restart`, a PaaS, or [FastMCP Cloud](https://gofastmcp.com)). The
+> server is read-only and stateless, so you can run multiple replicas behind a
+> load balancer. Put it behind TLS/auth if exposed publicly.
+
 ## Project layout
 
 ```text
