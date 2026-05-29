@@ -1,0 +1,27 @@
+[book]
+title = "Dimensional Modelling Docs"
+authors = ["acivitillo"]
+description = "Reference documentation for dimensional (Kimball) data modelling."
+language = "en"
+src = "src"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+additional-css = ["theme/custom.css", "theme/zoom.css"]
+git-repository-url = ""
+edit-url-template = ""
+mathjax-support = false
+additional-js = ["mermaid.min.js", "mermaid-init.js", "theme/zoom.js"]
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.search]
+enable = true
+
+[preprocessor]
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"

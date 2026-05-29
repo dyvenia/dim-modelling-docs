@@ -1,0 +1,150 @@
+/* Zoom button + lightbox for images and Mermaid diagrams (see zoom.js). */
+
+.zoomable-wrap {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+/* Diagrams: fill the content column and center, instead of Mermaid's tiny
+   intrinsic size (its inline `max-width:<px>` is overridden here). */
+.zoomable-wrap--block {
+    display: block;
+    text-align: center;
+}
+
+.zoomable-wrap--block pre.mermaid {
+    margin: 0 auto;
+}
+
+.zoomable-wrap--block pre.mermaid svg {
+    max-width: 100% !important;
+    width: 100%;
+    height: auto;
+}
+
+.zoom-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--sidebar-non-existant, rgba(0, 0, 0, 0.15));
+    border-radius: 6px;
+    background: var(--bg, #fff);
+    color: var(--fg, #333);
+    cursor: zoom-in;
+    opacity: 0;
+    transition: opacity 0.15s ease, background 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    z-index: 2;
+}
+
+.zoomable-wrap:hover .zoom-btn,
+.zoom-btn:focus-visible {
+    opacity: 0.95;
+}
+
+.zoom-btn:hover {
+    background: var(--theme-hover, #e6e6e6);
+}
+
+/* Touch devices have no hover -- keep the button visible. */
+@media (hover: none) {
+    .zoom-btn {
+        opacity: 0.9;
+    }
+}
+
+/* Lightbox overlay. */
+html.zoom-open,
+html.zoom-open body {
+    overflow: hidden;
+}
+
+.zoom-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(2px);
+}
+
+.zoom-stage {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: grab;
+}
+
+.zoom-stage.grabbing {
+    cursor: grabbing;
+}
+
+.zoom-content {
+    transform-origin: center center;
+    transition: transform 0.05s linear;
+    user-select: none;
+    -webkit-user-drag: none;
+    background: #fff;
+    border-radius: 6px;
+}
+
+/* Size the zoomed image/diagram to fit the viewport initially. */
+.zoom-stage img.zoom-content,
+.zoom-stage pre.zoom-content svg,
+.zoom-stage svg.zoom-content {
+    max-width: 92vw;
+    max-height: 92vh;
+    width: auto;
+    height: auto;
+}
+
+.zoom-stage pre.zoom-content {
+    margin: 0;
+    padding: 16px;
+    background: #fff;
+    border: none;
+    box-shadow: none;
+}
+
+.zoom-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.zoom-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.zoom-hint {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.8rem;
+    pointer-events: none;
+    user-select: none;
+}

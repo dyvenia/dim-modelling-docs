@@ -1,0 +1,13 @@
+[project]
+name = "dim-modelling-docs-mcp"
+version = "0.1.0"
+description = "FastMCP server exposing the Dimensional Modelling Docs to LLMs."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastmcp>=2.0.0",
+]
+
+# Run as a script (`uv run server.py`), not an installable package.
+[tool.uv]
+package = false
