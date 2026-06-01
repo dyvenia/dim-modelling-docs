@@ -12,11 +12,11 @@ additional-css = ["theme/custom.css", "theme/zoom.css"]
 git-repository-url = ""
 edit-url-template = ""
 mathjax-support = false
-additional-js = ["mermaid.min.js", "mermaid-init.js", "theme/zoom.js"]
+additional-js = ["mermaid.min.js", "mermaid-init.js", "theme/zoom.js", "theme/sidebar.js"]
 
 [output.html.fold]
 enable = true
-level = 1
+level = 0   # collapse foldable groups (e.g. Definitions) by default
 
 [output.html.search]
 enable = true
@@ -25,3 +25,12 @@ enable = true
 
 [preprocessor.mermaid]
 command = "mdbook-mermaid"
+
+# Generates an LLM-friendly index at /llms.txt (see https://llmstxt.org).
+# Mirrors the SUMMARY.md nav as a link list with one-line descriptions.
+[preprocessor.llms-txt]
+command = "python3 tools/llms_txt_preprocessor.py"
+renderer = ["html"]
+# Absolute base URL for the links (recommended by the spec). Leave empty for
+# site-root-relative links, e.g. "concepts/dimension.html".
+site-url = "https://dyvenia.github.io/dim-modelling-docs/"

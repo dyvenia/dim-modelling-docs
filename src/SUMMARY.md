@@ -8,13 +8,15 @@
 - [Star Schema](./concepts/star-schema.md)
 - [Kimball Keys Definitions](./concepts/kimball-keys.md)
 
-# Reference
+- [References]()
+    - [Dimensions]()
+        - [Standard Cost](./references/dimensions/standard-cost.md)
+        - [Sales Territory](./references/dimensions/sales-territory.md)
+    - [Facts]()
+        - [Invoice Lines](./references/facts/invoice_lines.md)
 
-- [Standard Cost](./reference/standard-cost.md)
 
-
-# Definitions
-
-- [Degenerate Dimension](./definitions/degenerate-dimension.md)
-- [Grain](./definitions/grain.md)
-- [Slowly Changing Dimension](./definitions/slowly-changing-dimension.md)
+- [Definitions]()
+  - [Degenerate Dimension](./definitions/degenerate-dimension.md)
+  - [Grain](./definitions/grain.md)
+  - [Slowly Changing Dimension](./definitions/slowly-changing-dimension.md)

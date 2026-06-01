@@ -11,5 +11,5 @@ self-contained — no "see above" references._
 
 **Example:** _a concrete, ideally code-flavoured example._
 
-**See also:** _links to related [concepts](../concepts/), [reference](../reference/)
+**See also:** _links to related [concepts](../concepts/), [references](../references/)
 pages, or sibling definitions._

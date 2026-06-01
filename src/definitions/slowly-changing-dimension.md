@@ -17,4 +17,4 @@ the technique chosen for whether to keep or overwrite the prior values.
 old row (`valid_to`) and inserts a new current row, so historical facts still join
 to the address that was true at the time.
 
-**See also:** [Kimball Keys Definitions](../concepts/kimball-keys.md#surrogate-key) · [Standard Cost](../reference/standard-cost.md)
+**See also:** [Kimball Keys Definitions](../concepts/kimball-keys.md#surrogate-key) · [Standard Cost](../references/dimensions/standard-cost.md)
