@@ -129,7 +129,13 @@ def build_index(book, config):
         current = (heading, [])
         groups.append(current)
 
-    for item in book.get("items", []):
+    # mdBook >= 0.5 names the top-level list "items"; older versions used
+    # "sections". Accept either so the index works whatever mdBook the build
+    # (local or CI) happens to run.
+    items = book.get("items")
+    if items is None:
+        items = book.get("sections", [])
+    for item in items:
         if "PartTitle" in item:
             ensure(item["PartTitle"])
         elif "Chapter" in item:
