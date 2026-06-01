@@ -11,4 +11,4 @@ single table is the most common dimensional modelling mistake.
 **Example:** `fact_sales` at the grain *one row per product per order line* — so
 `quantity` and `extended_amount` are recorded per line, never per whole order.
 
-**See also:** [Standard Cost](../reference/standard-cost.md) (declares its grain as an explicit key tuple)
+**See also:** [Standard Cost](../references/dimensions/standard-cost.md) (declares its grain as an explicit key tuple)

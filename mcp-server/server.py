@@ -674,5 +674,15 @@ def read_definition(
 
 
 if __name__ == "__main__":
-    # Default transport is stdio -- the right choice for Claude Desktop / Code.
-    mcp.run()
+    # Transport is chosen via env so the same file works locally and deployed:
+    #   * unset / "stdio" -> stdio (Claude Desktop / Code, the default)
+    #   * "http"          -> streamable HTTP service (remote deployment)
+    transport = os.environ.get("MCP_TRANSPORT", "stdio")
+    if transport == "stdio":
+        mcp.run()
+    else:
+        mcp.run(
+            transport=transport,
+            host=os.environ.get("MCP_HOST", "0.0.0.0"),
+            port=int(os.environ.get("MCP_PORT", "8000")),
+        )

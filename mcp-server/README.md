@@ -81,3 +81,18 @@ claude mcp add dim-modelling-docs -- uv --directory /abs/path/to/mcp-server run 
 On Windows, either use the WSL path (`/mnt/c/Users/.../mcp-server`) when launching
 through WSL, or wrap the command with `wsl.exe -d Ubuntu -- ...` so the server runs
 in the same environment where `uv` and the docs live.
+
+## Deployment
+
+The transport is selected via the `MCP_TRANSPORT` env var, so the same
+`server.py` runs locally over stdio (default) or remotely over HTTP. To run it as
+a remote service:
+
+```bash
+MCP_TRANSPORT=http MCP_PORT=8000 uv run server.py   # http://<host>:8000/mcp
+```
+
+A [Dockerfile](Dockerfile) is included for containerized HTTP deployment (build
+from the repo root so the docs are bundled). Full instructions — env vars, Docker,
+and connecting a client to the deployed URL — are in the
+[project README](../README.md#mcp-server-mcp-serverserverpy).
