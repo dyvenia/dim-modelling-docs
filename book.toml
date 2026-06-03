@@ -9,8 +9,8 @@ src = "src"
 default-theme = "light"
 preferred-dark-theme = "navy"
 additional-css = ["theme/custom.css", "theme/zoom.css"]
-git-repository-url = ""
-edit-url-template = ""
+git-repository-url = "https://github.com/dyvenia/dim-modelling-docs"
+edit-url-template = "https://github.com/dyvenia/dim-modelling-docs/edit/main/src/{path}"
 mathjax-support = false
 additional-js = ["mermaid.min.js", "mermaid-init.js", "theme/zoom.js", "theme/sidebar.js"]
 
