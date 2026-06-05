@@ -8,6 +8,13 @@
 - [Star Schema](./concepts/star-schema.md)
 - [Kimball Keys Definitions](./concepts/kimball-keys.md)
 
+# Transformations
+
+- [Prepare](./transformations/prepare.md)
+- [Join](./transformations/join.md)
+- [Union](./transformations/union.md)
+- [Keys](./transformations/keys.md)
+
 - [References]()
     - [Dimensions]()
         - [Standard Cost](./references/dimensions/standard-cost.md)
