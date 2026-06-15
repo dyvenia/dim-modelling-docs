@@ -1,75 +1,45 @@
-# Summary
-
-[Introduction](./introduction.md)
-
-# Concepts
-
-- [Dimension](./concepts/dimension.md)
-- [Star Schema](./concepts/star-schema.md)
-- [Kimball Keys Definitions](./concepts/kimball-keys.md)
-
-# Transformations
-
-- [Prepare](./transformations/prepare.md)
-- [Join](./transformations/join.md)
-- [Union](./transformations/union.md)
-- [Keys](./transformations/keys.md)
-
-- [References]()
-    - [Dimensions]()
-        - [Standard Cost](./references/dimensions/standard-cost.md)
-        - [Sales Territory](./references/dimensions/sales-territory.md)
-    - [Facts]()
-        - [Invoice Lines](./references/facts/invoice_lines.md)
-
-
-- [Definitions]()
-  - [Degenerate Dimension](./definitions/degenerate-dimension.md)
-  - [Grain](./definitions/grain.md)
-  - [Slowly Changing Dimension](./definitions/slowly-changing-dimension.md)
-
-
-
-
-# Introduction
-   - Why this guide <!-- links to Playbook for process-->
-   - Who is this for <!--junior → senior, analyst → business-->
-   - How this fits with the Playbook & Templates <!--'map' of files -->
+# [Introduction](./introduction.md)
+   - Why this guide
+   - Who is this for
+   - How this fits with the Playbook & Templates
 
 # Foundations
-   - Why dimensional modeling <!--problem it solves -->
-   - The big picture  <!--landing→staging→dims/facts→marts -->
-   - Core principles at a glance
+   - [Why dimensional modeling](./foundations/big-picture.md)
+   - [The big picture](./foundations/core-principles.md)
+   - [Core principles at a glance](./foundations/why-dimensional-modeling.md)
 
-# Core Concepts
-   - Dimension
-   - Fact
-   - Grain
-   - Star Schema
-   - Keys (surrogate, natural, foreign)
+# [Core Concepts]
+   - [Dimension](./concepts/dimension.md)
+   - [Fact](./concepts/fact.md)
+   - [Grain](./concepts/grain.md)
+   - [Star Schema](./concepts/star-schema.md)
+   - [Keys (surrogate, natural, foreign)](./concepts/kimball-keys.md)
 
-# Transformations (link do pipeline templates)
-   - Prepare / standardise
-   - Join
-   - Union
-   - Keys & Unknown member
+# Transformations
+   - [Prepare / standardise](./transformations/prepare.md)
+   - [Join](./transformations/join.md)
+   - [Union](./transformations/union.md)
+   - [Keys & Unknown member](./transformations/keys-assignments.md)
 
-# Patterns & Edge Cases <!--this probably will grow over time, we have to agree on some concepts here as, as I said yesterday, this impacting dim model design -->
-   - Unknown member
-   - Late-arriving members
-   - Degenerate dimensions
-   - Outrigger
-   - Resolution engines (map_) <!-- tbd -->
-   - Composite keys
-   - Views for business (vw_) <!-- imo important for analysts -->
+# Patterns & Edge Cases
+   - [Unknown member](./patterns/unknown.md)
+   - [Late-arriving members](./patterns/late-arriving.md)
+   - [Degenerate dimensions](./patterns/degenerate-dimension.md)
+   - [Outrigger](./patterns/outtrigger.md)
+   - [Resolution engines (map_)](./patterns/resolution-engines.md)
+   - [Composite keys](./patterns/composite-keys.md)
+   - [Views for business (vw_)](./patterns/views.md)
 
-# Conventions <!-- we can use kimball/dyvenia standard -->
-   - Naming (_sk, _code, _number, is_, vw_, map_)
-   - Key strategy (hash hybrid, SCD2) <!-- hash hybrid = hasing key in dim and asigning to fact, not hashing in fact independently-->
+# Conventions
+   - [Naming (_sk, _code, _number, is_, vw_, map_)](./conventions/naming.md)
+   - [Key strategy (hash hybrid, SCD2)](./conventions/slowly-changing-dimension.md)
 
-# Reference
-   - Dimensions catalogue <!--(link do templates)-->
-   - Facts catalogue <!--(link do templates)-->
-
+# [Reference]()
+   - [Dimensions catalogue]()
+      - [Standard Cost](./references/dimensions/standard-cost.md)
+      - [Sales Territory](./references/dimensions/sales-territory.md)
+   - [Facts catalogue]()
+      - [Invoice Lines](./references/facts/invoice_lines.md)
+      
 # Glossary
-   - SCD, grain, degenerate dim, conformed dim, etc.
+   - [SCD, grain, degenerate dim, conformed dim, etc.](./glossary.md)

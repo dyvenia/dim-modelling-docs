@@ -18,28 +18,20 @@ same gaps. They were:
 So this guide is deliberately pragmatic: short explanations backed by real
 examples we have encountered while developing facts and dimensions in production.
 
-## Concepts
+## Who is this for
 
-The [Concepts](./concepts/dimension.md) section covers the foundational building
-blocks of dimensional modelling — the ideas you compose into a model. Start with
-the [Dimension](./concepts/dimension.md), see how dimensions and facts fit
-together in a [Star Schema](./concepts/star-schema.md), then learn how rows are
-identified and linked in [Kimball Keys Definitions](./concepts/kimball-keys.md).
+This documentation is designed to be accessible and valuable across different roles and experience levels:
 
-## Definitions
+*   **Data & Analytics Engineers (Junior to Senior):** To learn the technical standards, transformation patterns, and key strategies (such as hash hybrids and SCD2) required to build robust pipelines.
+*   **Data Analysts:** To understand how our data marts are structured, how to query facts and dimensions correctly, and how to utilize business-facing views.
+*   **Business Stakeholders:** To grasp the core concepts of our data models and align on shared terminology (like grain, dimensions, and facts) when defining data requirements.
 
-The [Kimball Group](https://www.kimballgroup.com/) website already offers
-excellent, concise definitions. Here the focus is narrower: collect the terms
-that come up most often during development, each as a short, self-contained
-definition with an example where it helps. See
-[Degenerate Dimension](./definitions/degenerate-dimension.md) or
-[Slowly Changing Dimension](./definitions/slowly-changing-dimension.md) for the
-shape these take.
 
-## Reference
+## How this fits with the Playbook & Templates
 
-The Reference section is a growing catalogue of the facts and dimensions you meet
-in real-life scenarios. Each page documents one entity — its grain, schema,
-worked SQL, and common pitfalls — so you have a standard to design and build from
-(and one an LLM can quote). [Standard Cost](./references/dimensions/standard-cost.md) is the
-first worked example.
+This guide does not exist in isolation. It acts as the conceptual bridge between our high-level processes and our low-level code templates. Here is how you can navigate the ecosystem:
+
+*   **The Playbook:** Covers the "how-to" of our delivery process, CI/CD, and overall architecture.
+*   **This Guide:** Covers the "what" and "why" of our dimensional models (Core Concepts, Transformations, Patterns, and Conventions).
+*   **Templates & Reference Catalogues:** For practical, everyday implementation, refer to our [Dimensions Catalogue](link) and [Facts Catalogue](link). They provide concrete examples based directly on the rules defined in this guide.
+
