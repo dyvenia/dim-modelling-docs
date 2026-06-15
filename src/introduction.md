@@ -33,5 +33,5 @@ This guide does not exist in isolation. It acts as the conceptual bridge between
 
 *   **The Playbook:** Covers the "how-to" of our delivery process, CI/CD, and overall architecture.
 *   **This Guide:** Covers the "what" and "why" of our dimensional models (Core Concepts, Transformations, Patterns, and Conventions).
-*   **Templates & Reference Catalogues:** For practical, everyday implementation, refer to our [Dimensions Catalogue](link) and [Facts Catalogue](link). They provide concrete examples based directly on the rules defined in this guide.
+*   **Templates & Reference Catalogues:** For practical, everyday implementation, refer to our Dimensions Catalogue and Facts Catalogue. They provide concrete examples based directly on the rules defined in this guide.
 

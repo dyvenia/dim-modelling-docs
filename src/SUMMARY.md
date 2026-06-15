@@ -1,14 +1,12 @@
-# [Introduction](./introduction.md)
-   - Why this guide
-   - Who is this for
-   - How this fits with the Playbook & Templates
+# Summary
+[Introduction](./introduction.md)
 
 # Foundations
    - [Why dimensional modeling](./foundations/big-picture.md)
    - [The big picture](./foundations/core-principles.md)
    - [Core principles at a glance](./foundations/why-dimensional-modeling.md)
 
-# [Core Concepts]
+# Core Concepts
    - [Dimension](./concepts/dimension.md)
    - [Fact](./concepts/fact.md)
    - [Grain](./concepts/grain.md)
