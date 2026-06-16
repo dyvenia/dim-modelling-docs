@@ -1,3 +1,303 @@
+/* ---------------------------------------------------------------------------
+   dyvenia brand alignment for mdBook
+   Mirrors the design system at https://dyvenia.com:
+     - Typeface: IBM Plex Sans (their "Clear Sans") + a monospace stack
+     - Light theme: teal accent (#0e909d) on near-black text (#242425)
+     - Dark (navy) theme: navy/purple sections (#1f1254 / #9484e3)
+   @import must stay first in the file.
+--------------------------------------------------------------------------- */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap");
+
+/* Brand typeface everywhere mdBook sets a font. */
+:root {
+    --mono-font: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
+        Consolas, "DejaVu Sans Mono", monospace;
+}
+
+html,
+body,
+.menu-title,
+.sidebar,
+.chapter,
+.content p,
+.content li,
+.content table,
+h1, h2, h3, h4, h5, h6 {
+    font-family: "IBM Plex Sans", system-ui, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Headings: slightly tighter and bolder, matching the dyvenia display style. */
+.content h1,
+.content h2,
+.content h3 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+/* -------------------------------------------------------------------------
+   Light theme  →  teal accent on warm-grey neutrals
+------------------------------------------------------------------------- */
+.light,
+html:not(.js) {
+    --bg: #ffffff;
+    --fg: #242425;                 /* gray-900 */
+
+    --sidebar-bg: #f5f5f5;         /* gray-100 */
+    --sidebar-fg: #242425;
+    --sidebar-non-existant: #aeaeae;
+    --sidebar-active: #0e909d;     /* brand teal */
+    --sidebar-spacer: #dedede;
+
+    --scrollbar: #808081;
+
+    --icons: #636364;
+    --icons-hover: #242425;
+
+    --links: #00737f;              /* teal-600, readable on white */
+
+    --inline-code-color: #005b68;  /* teal-700 */
+
+    --theme-popup-bg: #ffffff;
+    --theme-popup-border: #dedede;
+    --theme-hover: #f5f5f5;
+
+    --quote-bg: #e4f6f8;           /* teal-100 */
+    --quote-border: #c9f4fa;       /* teal-200 */
+
+    --table-border-color: #dedede;
+    --table-header-bg: #dedede;
+    --table-alternate-bg: #f5f5f5;
+
+    --searchbar-border-color: #dedede;
+    --searchbar-bg: #f5f5f5;
+    --searchbar-fg: #242425;
+    --searchresults-li-bg: #e4f6f8;
+    --search-mark-bg: #c9f4fa;
+
+    --footnote-highlight: #0e909d;
+    --sidebar-header-border-color: #0e909d;
+
+    /* GitHub-style alert accents, from dyvenia's rainbow palette
+       (darkened where needed to stay legible on white). */
+    --blockquote-note-color: #00737f;       /* teal   */
+    --blockquote-tip-color: #3f9a3a;        /* green  */
+    --blockquote-important-color: #6b54b3;  /* purple */
+    --blockquote-warning-color: #9a6a00;    /* amber  */
+    --blockquote-caution-color: #c0314c;    /* pink   */
+}
+
+/* -------------------------------------------------------------------------
+   Rust (light) theme  →  dyvenia "soft light": a warm-grey paper surface
+   (gray-100 page, white panels) instead of stark white, same teal accent.
+------------------------------------------------------------------------- */
+.rust {
+    --bg: #f5f5f5;                 /* gray-100 page */
+    --fg: #242425;                 /* gray-900 */
+
+    --sidebar-bg: #ededed;
+    --sidebar-fg: #242425;
+    --sidebar-non-existant: #aeaeae;
+    --sidebar-active: #0e909d;     /* brand teal */
+    --sidebar-spacer: #dedede;
+
+    --scrollbar: #808081;
+
+    --icons: #636364;
+    --icons-hover: #242425;
+
+    --links: #00737f;              /* teal-600 */
+
+    --inline-code-color: #005b68;  /* teal-700 */
+
+    --theme-popup-bg: #ffffff;
+    --theme-popup-border: #dedede;
+    --theme-hover: #e6e6e6;
+
+    --quote-bg: #e4f6f8;           /* teal-100 */
+    --quote-border: #c9f4fa;       /* teal-200 */
+
+    --table-border-color: #dedede;
+    --table-header-bg: #dedede;
+    --table-alternate-bg: #ededed;
+
+    --searchbar-border-color: #dedede;
+    --searchbar-bg: #ffffff;
+    --searchbar-fg: #242425;
+    --searchresults-li-bg: #e4f6f8;
+    --search-mark-bg: #c9f4fa;
+
+    --footnote-highlight: #0e909d;
+    --sidebar-header-border-color: #0e909d;
+
+    --blockquote-note-color: #00737f;
+    --blockquote-tip-color: #3f9a3a;
+    --blockquote-important-color: #6b54b3;
+    --blockquote-warning-color: #9a6a00;
+    --blockquote-caution-color: #c0314c;
+}
+
+/* -------------------------------------------------------------------------
+   Coal (dark) theme  →  dyvenia's real dark mode (neutral charcoal)
+   Page #2d2e2f / panels #242425 — darker and richer than mdBook's default.
+------------------------------------------------------------------------- */
+.coal {
+    --bg: #2d2e2f;                 /* gray-800 — dyvenia dark-mode page */
+    --fg: #f5f5f5;                 /* gray-100 */
+
+    --sidebar-bg: #242425;         /* gray-900 */
+    --sidebar-fg: #f5f5f5;
+    --sidebar-non-existant: #636364;
+    --sidebar-active: #61beca;     /* teal-400 — accent on dark */
+    --sidebar-spacer: #3a3a3b;     /* gray-700 */
+
+    --scrollbar: #808081;
+
+    --icons: #808081;
+    --icons-hover: #f5f5f5;
+
+    --links: #61beca;              /* teal-400 */
+
+    --inline-code-color: #92e0ea;  /* teal-300 */
+
+    --theme-popup-bg: #242425;
+    --theme-popup-border: #474849; /* gray-600 */
+    --theme-hover: #3a3a3b;
+
+    --quote-bg: #242425;
+    --quote-border: #3a3a3b;
+
+    --table-border-color: #3a3a3b;
+    --table-header-bg: #3a3a3b;
+    --table-alternate-bg: #242425;
+
+    --searchbar-border-color: #474849;
+    --searchbar-bg: #3a3a3b;
+    --searchbar-fg: #f5f5f5;
+    --searchresults-li-bg: #242425;
+    --search-mark-bg: #00737f;
+
+    --footnote-highlight: #0e909d;
+    --sidebar-header-border-color: #0e909d;
+
+    /* Bright alert accents from dyvenia's rainbow palette (on dark). */
+    --blockquote-note-color: #08bccb;       /* teal   */
+    --blockquote-tip-color: #62c95c;        /* green  */
+    --blockquote-important-color: #a977d5;  /* purple */
+    --blockquote-warning-color: #fbbe25;    /* amber  */
+    --blockquote-caution-color: #ef5d77;    /* pink   */
+}
+
+/* -------------------------------------------------------------------------
+   Ayu (dark) theme  →  the darkest option: near-black with teal accent,
+   echoing dyvenia's deepest sections (#242425 / navy-dark).
+------------------------------------------------------------------------- */
+.ayu {
+    --bg: #1a1a1b;
+    --fg: #dedede;                 /* gray-200 */
+
+    --sidebar-bg: #141415;
+    --sidebar-fg: #dedede;
+    --sidebar-non-existant: #5b5b5c;
+    --sidebar-active: #61beca;     /* teal-400 */
+    --sidebar-spacer: #2d2e2f;
+
+    --scrollbar: #636364;
+
+    --icons: #808081;
+    --icons-hover: #f5f5f5;
+
+    --links: #61beca;
+
+    --inline-code-color: #92e0ea;
+
+    --theme-popup-bg: #141415;
+    --theme-popup-border: #3a3a3b;
+    --theme-hover: #242425;
+
+    --quote-bg: #242425;
+    --quote-border: #3a3a3b;
+
+    --table-border-color: #2d2e2f;
+    --table-header-bg: #2d2e2f;
+    --table-alternate-bg: #1f1f20;
+
+    --searchbar-border-color: #3a3a3b;
+    --searchbar-bg: #2d2e2f;
+    --searchbar-fg: #f5f5f5;
+    --searchresults-li-bg: #242425;
+    --search-mark-bg: #00737f;
+
+    --footnote-highlight: #0e909d;
+    --sidebar-header-border-color: #0e909d;
+
+    --blockquote-note-color: #08bccb;
+    --blockquote-tip-color: #62c95c;
+    --blockquote-important-color: #a977d5;
+    --blockquote-warning-color: #fbbe25;
+    --blockquote-caution-color: #ef5d77;
+}
+
+/* -------------------------------------------------------------------------
+   Navy (dark) theme  →  dyvenia's deep navy/purple hero & CTA sections
+   Page purple-900 #170c35 / sidebar navy-dark #090632.
+------------------------------------------------------------------------- */
+.navy {
+    --bg: #170c35;                 /* purple-900 — deep */
+    --fg: #ece9f7;
+
+    --sidebar-bg: #090632;         /* navy-dark */
+    --sidebar-fg: #f1efff;         /* purple-100 */
+    --sidebar-non-existant: #6451ab;
+    --sidebar-active: #ada0f7;     /* purple-400 */
+    --sidebar-spacer: #3e2e75;
+
+    --scrollbar: #8675d3;
+
+    --icons: #8675d3;
+    --icons-hover: #f1efff;
+
+    --links: #ada0f7;              /* purple-400 */
+
+    --inline-code-color: #cfc5ff;  /* purple-300 */
+
+    --theme-popup-bg: #090632;
+    --theme-popup-border: #4e3a92;
+    --theme-hover: #241252;
+
+    --quote-bg: #1f1254;           /* navy */
+    --quote-border: #3e2e75;       /* purple-800 */
+
+    --table-border-color: #3e2e75;
+    --table-header-bg: #3e2e75;
+    --table-alternate-bg: #1f1254;
+
+    --searchbar-border-color: #4e3a92;
+    --searchbar-bg: #241252;
+    --searchbar-fg: #f1efff;
+    --searchresults-li-bg: #1f1254;
+    --search-mark-bg: #6451ab;
+
+    --footnote-highlight: #9484e3;
+    --sidebar-header-border-color: #9484e3;
+
+    --blockquote-note-color: #ada0f7;       /* purple-leaning on navy */
+    --blockquote-tip-color: #62c95c;
+    --blockquote-important-color: #cfc5ff;
+    --blockquote-warning-color: #fbbe25;
+    --blockquote-caution-color: #ef5d77;
+}
+
+/* Brand-coloured underline on the active sidebar entry for a bit of polish. */
+.chapter li.chapter-item a.active {
+    color: var(--sidebar-active);
+    font-weight: 600;
+}
+
+/* ---------------------------------------------------------------------------
+   Existing customisations
+--------------------------------------------------------------------------- */
+
 /* Hide the previous/next chapter navigation arrows (desktop + mobile). */
 .nav-chapters,
 .mobile-nav-chapters {

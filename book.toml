@@ -6,8 +6,8 @@ language = "en"
 src = "src"
 
 [output.html]
-default-theme = "light"
-preferred-dark-theme = "navy"
+default-theme = "rust"          # dyvenia "soft light": warm-grey paper (#f5f5f5)
+preferred-dark-theme = "coal"   # dyvenia's charcoal dark mode (#2d2e2f)
 additional-css = ["theme/custom.css", "theme/zoom.css"]
 git-repository-url = "https://github.com/dyvenia/dim-modelling-docs"
 edit-url-template = "https://github.com/dyvenia/dim-modelling-docs/edit/main/src/{path}"
