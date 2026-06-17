@@ -1,11 +1,6 @@
 # Summary
 [Introduction](./introduction.md)
 
-# Foundations
-   - [Why dimensional modeling](./foundations/big-picture.md)
-   - [The big picture](./foundations/core-principles.md)
-   - [Core principles at a glance](./foundations/why-dimensional-modeling.md)
-
 # Core Concepts
    - [Dimension](./concepts/dimension.md)
    - [Fact](./concepts/fact.md)
@@ -29,8 +24,9 @@
    - [Views for business (vw_)](./patterns/views.md)
 
 # Conventions
+   - [Slowly Changing Dimensions (SCD)](./conventions/slowly-changing-dimension.md)
    - [Naming (_sk, _code, _number, is_, vw_, map_)](./conventions/naming.md)
-   - [Key strategy (hash hybrid, SCD2)](./conventions/slowly-changing-dimension.md)
+   - [Key strategy (hash hybrid, surrogate keys)](./conventions/key-strategy.md)
 
 # [Reference]()
    - [Dimensions catalogue]()

@@ -6,6 +6,27 @@ collects the concepts, definitions, and reference models we rely on when
 designing facts and dimensions, written to be useful both to the analytics
 engineers on the team and to the LLMs that assist them.
 
+## Why dimensional modeling
+
+Source systems like SAP are built to *run* the business — thousands of
+normalised tables optimised for fast, safe transactions. They are not built to
+*analyse* the business. Asking "what did we sell, to whom, by product line, this
+quarter?" against raw source tables means joining dozens of tables, decoding
+cryptic keys, and reconciling inconsistent values — slow to write, slow to run,
+and easy to get wrong.
+
+Dimensional modeling reorganises that same data around how the business actually
+asks questions. Facts hold the measurements (amounts, quantities); dimensions
+hold the descriptive context (customer, product, date) you slice and group by.
+The result is a model that is:
+
+* **Understandable** — business users recognise the structure without a data dictionary.
+* **Fast** — star schemas are optimised for the read-heavy, aggregate queries that reporting needs.
+* **Consistent** — conformed dimensions mean "revenue by business unit" reconciles across every report.
+
+In short: we do dimensional modeling so the business can answer its own questions
+quickly, correctly, and in the same language everywhere.
+
 ## Why this guide
 
 There are many excellent Kimball books and tutorials, but we kept hitting the
@@ -33,5 +54,4 @@ This guide does not exist in isolation. It acts as the conceptual bridge between
 
 *   **The Playbook:** Covers the "how-to" of our delivery process, CI/CD, and overall architecture.
 *   **This Guide:** Covers the "what" and "why" of our dimensional models (Core Concepts, Transformations, Patterns, and Conventions).
-*   **Templates & Reference Catalogues:** For practical, everyday implementation, refer to our Dimensions Catalogue and Facts Catalogue. They provide concrete examples based directly on the rules defined in this guide.
-
+*   **Templates & Reference Catalogues:** For practical, everyday implementation, refer to our [Dimensions Template](./references/dimensions/dimension_template.md) and [Facts Template](./references/dimensions/fact_template.md). They provide concrete examples based directly on the rules defined in this guide.
