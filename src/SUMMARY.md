@@ -1,29 +1,39 @@
 # Summary
-
 [Introduction](./introduction.md)
 
-# Concepts
-
-- [Dimension](./concepts/dimension.md)
-- [Star Schema](./concepts/star-schema.md)
-- [Kimball Keys Definitions](./concepts/kimball-keys.md)
+# Core Concepts
+   - [Dimension](./concepts/dimension.md)
+   - [Fact](./concepts/fact.md)
+   - [Grain](./concepts/grain.md)
+   - [Star Schema](./concepts/star-schema.md)
+   - [Keys (surrogate, natural, foreign)](./concepts/kimball-keys.md)
 
 # Transformations
+   - [Prepare / standardise](./transformations/prepare.md)
+   - [Join](./transformations/join.md)
+   - [Union](./transformations/union.md)
+   - [Keys & Unknown member](./transformations/keys-assignments.md)
 
-- [Prepare](./transformations/prepare.md)
-- [Join](./transformations/join.md)
-- [Union](./transformations/union.md)
-- [Keys](./transformations/keys.md)
+# Patterns & Edge Cases
+   - [Unknown member](./patterns/unknown.md)
+   - [Late-arriving members](./patterns/late-arriving.md)
+   - [Degenerate dimensions](./patterns/degenerate-dimension.md)
+   - [Outrigger](./patterns/outtrigger.md)
+   - [Resolution engines (map_)](./patterns/resolution-engines.md)
+   - [Composite keys](./patterns/composite-keys.md)
+   - [Views for business (vw_)](./patterns/views.md)
 
-- [References]()
-    - [Dimensions]()
-        - [Standard Cost](./references/dimensions/standard-cost.md)
-        - [Sales Territory](./references/dimensions/sales-territory.md)
-    - [Facts]()
-        - [Invoice Lines](./references/facts/invoice_lines.md)
+# Conventions
+   - [Slowly Changing Dimensions (SCD)](./conventions/slowly-changing-dimension.md)
+   - [Naming (_sk, _code, _number, is_, vw_, map_)](./conventions/naming.md)
+   - [Key strategy (hash hybrid, surrogate keys)](./conventions/key-strategy.md)
 
-
-- [Definitions]()
-  - [Degenerate Dimension](./definitions/degenerate-dimension.md)
-  - [Grain](./definitions/grain.md)
-  - [Slowly Changing Dimension](./definitions/slowly-changing-dimension.md)
+# [Reference]()
+   - [Dimensions catalogue]()
+      - [Standard Cost](./references/dimensions/standard-cost.md)
+      - [Sales Territory](./references/dimensions/sales-territory.md)
+   - [Facts catalogue]()
+      - [Invoice Lines](./references/facts/invoice_lines.md)
+      
+# Glossary
+   - [SCD, grain, degenerate dim, conformed dim, etc.](./glossary.md)
