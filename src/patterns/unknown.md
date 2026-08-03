@@ -42,7 +42,7 @@ This is generally preferable to:
 
 Every dimension referenced by a fact table should contain an unknown member.
 
-When a valid dimension member cannot be found, the fact table should use the surrogate key of the unknown member.
+**When a valid dimension member cannot be found, the fact table should use the surrogate key of the unknown member.**
 
 The unknown member should be added in the final dimension model as a predefined technical row, normally using `UNION ALL` with the regular dimension records. This ensures that the row is recreated consistently whenever the dimension is built or refreshed. Separate post-load inserts should be used only where the dimension loading strategy makes the union pattern impractical.
 
