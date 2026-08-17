@@ -22,11 +22,72 @@ A `map_` keeps that rule in one place, as the single source of truth. Think of i
 
 ## The three shapes
 
-Almost every `map_` is one of three patterns:
+Almost every `map_` is one of three patterns.
 
-- **Code-type resolution** — one field holds two kinds of code, told apart by something you can detect, like length or prefix. The engine spots the type and resolves each to the same key. *Example: an outlet field holding either a single store code or a regional cluster code.*
-- **Context-dependent resolution** — the code isn't unique on its own; it becomes unique only when combined with another field. That field can be a simple piece of context or a second full-fledged code — either way, the engine combines them into one clean key. *Example: a product code that repeats across catalogues and is unique only within one; or a code that only means something once paired with the customer it belongs to.*
-- **Hierarchy walk-up** — the source is a parent-child tree of uneven depth, and you need a leaf resolved up to a set level. The engine climbs the tree and stops at that level. *Example: any node in an org tree resolved up to its department.*
+### Code-type resolution
+
+One field holds two kinds of code, told apart by something you can detect, like length or prefix. The engine spots the type and resolves each to the same key.
+
+*Example: an outlet field holding either a 5-digit store code or a 2-digit cluster code.*
+
+```sql
+-- map_outlet
+SELECT
+    o.outlet_code,
+    CASE WHEN LENGTH(o.outlet_code) = 5
+         THEN o.outlet_code            -- store: use as-is
+         ELSE lead.cluster_store_nk    -- cluster: its lead store
+    END AS store_nk
+FROM stg_outlets o
+LEFT JOIN map_cluster_lead lead
+    ON lead.outlet_code = o.outlet_code;
+```
+
+One row per operational input, one clean key out:
+
+| outlet_code | store_nk |
+|-------------|----------|
+| 10432       | 10432    |
+| 10433       | 10433    |
+| 22          | 10500    |
+| 10510       | 10510    |
+| 07          | 10600    |
+| 10611       | 10611    |
+
+### Context-dependent resolution
+
+The code isn't unique on its own; it becomes unique only when combined with another field. That field can be a simple piece of context or a second full-fledged code — either way, the engine combines them into one clean key.
+
+*Example: a product code that repeats across catalogues and is unique only within one.*
+
+```sql
+-- map_product
+SELECT c.catalogue_id, c.product_code, x.global_product_nk
+FROM stg_catalogue_lines c
+JOIN map_catalogue_crossref x
+    ON  x.catalogue_id = c.catalogue_id
+    AND x.product_code = c.product_code;
+```
+
+### Hierarchy walk-up
+
+The source is a parent-child tree of uneven depth, and you need a leaf resolved up to a set level. The engine climbs the tree and stops at that level.
+
+*Example: any node in an org tree resolved up to its department.*
+
+```sql
+-- map_department: climb until the ancestor is a department
+WITH RECURSIVE walk (node, ancestor) AS (
+    SELECT node, node FROM stg_org_edges
+    UNION ALL
+    SELECT w.node, e.parent
+    FROM walk w
+    JOIN stg_org_edges e ON e.child = w.ancestor
+)
+SELECT node, ancestor AS department_nk
+FROM walk
+WHERE ancestor IN (SELECT dept_code FROM stg_departments);
+```
 
 ## The golden rule: resolve before the key, never in the fact
 
@@ -38,6 +99,18 @@ flowchart LR
     map --> nk[Clean natural key]
     nk --> join[Fact joins the dimension on the natural key]
     join --> fk[Fact foreign key]
+```
+
+In the fact load, that is one step — read the resolved key, join the dimension, fall back to Unknown when nothing resolves:
+
+```sql
+SELECT
+    s.*,
+    COALESCE(d.store_sk, unk.store_sk) AS store_sk
+FROM stg_sales s
+JOIN map_outlet m     ON m.outlet_code = s.outlet_code
+LEFT JOIN dim_store d ON d.store_nk    = m.store_nk
+CROSS JOIN (SELECT store_sk FROM dim_store WHERE store_nk = 'UNKNOWN') unk;
 ```
 
 The surrogate key is created once, in the dimension; the fact only ever takes a copy. Keeping resolution and key assignment as separate steps is what lets you check a resolution on its own, reuse it across many facts, and re-run the load without surprises. A fact that resolves codes inline puts these jobs back together and brings back every problem the `map_` was built to remove.
