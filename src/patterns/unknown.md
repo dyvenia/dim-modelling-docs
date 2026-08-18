@@ -8,14 +8,14 @@ For example:
 
 | customer_sk                        | customer_number | customer_name    |
 | ---------------------------------- | --------------- | ---------------- |
-| `00000000000000000000000000000000` | UNKNOWN         | Unknown Customer |
-| `a1b2c3...`                        | C10001          | Customer A       |
-| `d4e5f6`                           | C10002          | Customer B       |
+|                                  0 | UNKNOWN         | Unknown Customer |
+|                                 101| C10001          | Customer A       |
+|                                 102| C10002          | Customer B       |
 
 A fact record with no valid customer would use:
 
 ```text
-customer_sk = '00000000000000000000000000000000'
+customer_sk = 0
 ```
 
 ## Why an unknown member is needed
@@ -46,13 +46,19 @@ Every dimension referenced by a fact table should contain an unknown member.
 
 The unknown member should be added in the final dimension model as a predefined technical row, normally using `UNION ALL` with the regular dimension records. This ensures that the row is recreated consistently whenever the dimension is built or refreshed. Separate post-load inserts should be used only where the dimension loading strategy makes the union pattern impractical.
 
-When surrogate keys are generated using `MD5`, the standard unknown surrogate key should be a fixed reserved value with the same data type and length:
+The recommended approach is to use an integer-based surrogate key, generated using an agreed hash or another deterministic integer key-generation function.
+
+The standard unknown surrogate key should be:
 
 ```text
-00000000000000000000000000000000
+0
 ```
 
-The reserved value must be used consistently in the dimension and in all fact lookups
+The same key-generation approach must be applied consistently across dimensions and facts.
+
+Depending on the data platform and its limitations, other approaches may also be used. For example, a platform may provide a different key-generation function or require a text-based hash such as MD5.
+
+The selected approach should remain deterministic and reproducible for the same business key and should be defined as part of the modeling standards.
 
 For example:
 
@@ -61,7 +67,7 @@ WITH
 
 dimension_data as (
     SELECT
-        MD5(CONCAT_WS('||', customer_number, source_system)) as customer_sk,
+        HASH(customer_number, source_system) as customer_sk,
         customer_number,
         customer_name,
         source_system
@@ -70,7 +76,7 @@ dimension_data as (
 
 unknown_member as (
     SELECT
-        '00000000000000000000000000000000' as customer_sk,
+        0 as customer_sk,
         'UNKNOWN' as customer_number,
         'Unknown Customer' as customer_name,
         'SYSTEM' as source_system
@@ -102,10 +108,10 @@ If no matching dimension member is found, the unknown surrogate key is assigned 
 
 ```sql
 SELECT
-    MD5(CONCAT_WS('||', f.billing_document_number, f.billing_item_number)) as billing_sk,
+    HASH(f.billing_document_number, f.billing_item_number) as billing_sk,
     f.billing_document_number,
     f.billing_item_number,
-    COALESCE(d.customer_key, '00000000000000000000000000000000') as customer_sk,
+    COALESCE(d.customer_key, 0) as customer_sk,
     f.net_amount
 FROM staging.billing_items as f
 LEFT JOIN dimensions.dim_customer as d
@@ -131,7 +137,7 @@ customer_sk = NULL
 Use:
 
 ```text
-customer_sk = '00000000000000000000000000000000'
+customer_sk = 0
 ```
 
 This provides several benefits:
@@ -173,7 +179,7 @@ Example:
 
 | customer_sk                        | customer_number | valid_from | valid_to   | is_current |
 | ---------------------------------- | --------------- | ---------- | ---------- | ---------- |
-| `00000000000000000000000000000000` | UNKNOWN         | 1900-01-01 | 9999-12-31 | 1          |
+|                                  0 | UNKNOWN         | 1900-01-01 | 9999-12-31 | 1          |
 
 The unknown member:
 
