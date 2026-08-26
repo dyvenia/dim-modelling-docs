@@ -6,7 +6,7 @@ Most facts don't need a `map_` at all. They already carry a clean natural key an
 
 ## Not a dimension, not a fact
 
-A `map_` is a third kind of object, and knowing what it *isn't* tells you where it belongs.
+A `map_` is a supporting ETL object rather than a part of the dimensional model itself. Facts and dimensions are what the model is made of; a `map_` is machinery that helps build them. Knowing that tells you where it belongs.
 
 - **Not a fact** — it records no business event and holds no measures. It resolves a code, it doesn't measure anything.
 - **Not a dimension** — it is never filtered, grouped, or shown on a report. Users don't see it; only the load uses it.
@@ -89,9 +89,11 @@ FROM walk
 WHERE ancestor IN (SELECT dept_code FROM stg_departments);
 ```
 
-## The golden rule: resolve before the key, never in the fact
+## Resolve before the key, never in the fact
 
-The fact never untangles source codes and never builds its own keys. It receives a clean natural key from the `map_`, then joins the dimension on that key and takes the surrogate key from it — nothing more.
+Resolution that is complex or reused should be handled before the fact, rather than repeated inside each one. The fact should normally consume a clean natural key instead of untangling source codes itself.
+
+One part of this is not a matter of preference: **the fact does not build its own keys.** It joins the dimension on the natural key and takes the surrogate key from there. The key is created once, in the dimension, and the fact only ever takes a copy.
 
 ```
 flowchart LR
@@ -108,17 +110,17 @@ SELECT
     s.*,
     COALESCE(d.store_sk, unk.store_sk) AS store_sk
 FROM stg_sales s
-JOIN map_outlet m     ON m.outlet_code = s.outlet_code
-LEFT JOIN dim_store d ON d.store_nk    = m.store_nk
+LEFT JOIN map_outlet m ON m.outlet_code = s.outlet_code
+LEFT JOIN dim_store d  ON d.store_nk    = m.store_nk
 CROSS JOIN (SELECT store_sk FROM dim_store WHERE store_nk = 'UNKNOWN') unk;
 ```
 
-The surrogate key is created once, in the dimension; the fact only ever takes a copy. Keeping resolution and key assignment as separate steps is what lets you check a resolution on its own, reuse it across many facts, and re-run the load without surprises. A fact that resolves codes inline puts these jobs back together and brings back every problem the `map_` was built to remove.
+Keeping resolution and key assignment as separate steps is what lets you check a resolution on its own, reuse it across many facts, and re-run the load without surprises. A fact that resolves codes inline puts these jobs back together and brings back every problem the `map_` was built to remove.
 
-## Two properties that matter
+## Two things to get right
 
-- **Persisted, not inline.** A `map_` is a view or table, not a throwaway step hidden inside one model — so you can inspect and reuse the resolution. Rule of thumb: if two or more models need the resolution, it earns its own object.
-- **Deterministic.** The same code must always resolve to the same key. A `map_` depends only on its inputs, never on when it ran. That's what keeps loads reproducible — a rule that could give a different answer on re-run is a bug, not a resolution engine.
+- **Persisted where it is shared.** A `map_` is normally a view or table rather than a step hidden inside one model, so the resolution can be inspected and reused. For simple logic used in a single place, keeping it inline can be reasonable — once two or more models need it, or the logic gets complex, it earns its own object.
+- **Deterministic.** The same inputs must always produce the same key. Those inputs are not only the code — a resolution may also depend on source system, company, effective date, or other context. What matters is that the full set of inputs always resolves the same way, whenever it runs. A rule that could give a different answer on re-run is a bug, not a resolution engine.
 
 ## Common Pitfalls
 
