@@ -108,17 +108,19 @@ Recommended pattern:
 create view finance_emea.fct_billing_cogs as
 
 SELECT
-    billing_document_sk,
-    billing_date_sk,
-    sold_to_customer_sk,
-    material_sk,
-    sales_organization_sk,
-    document_currency_sk,
-    cogs_amount_doc,
-    cogs_amount_lcy,
-    cogs_amount_eur
-FROM facts.fct_billing_cogs
-WHERE region_code = 'EMEA';
+    f.billing_document_sk,
+    f.billing_date_sk,
+    f.sold_to_customer_sk,
+    f.material_sk,
+    f.sales_organization_sk,
+    f.document_currency_sk,
+    f.cogs_amount_doc,
+    f.cogs_amount_lcy,
+    f.cogs_amount_eur
+FROM facts.fct_billing_cogs f
+LEFT JOIN dimensions.dim_sales_organization o
+    ON o.sales_organization_sk = f.sales_organization_sk
+WHERE o.region_code = 'EMEA';
 ```
 
 The view should make the access scope clear, but the calculation of `cogs_amount_doc`, `cogs_amount_lcy`, or `cogs_amount_eur` should already happen in the modeled fact table.
