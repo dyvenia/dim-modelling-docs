@@ -118,7 +118,7 @@ SELECT
     f.cogs_amount_lcy,
     f.cogs_amount_eur
 FROM facts.fct_billing_cogs f
-LEFT JOIN dimensions.dim_sales_organization o
+JOIN dimensions.dim_sales_organization o
     ON o.sales_organization_sk = f.sales_organization_sk
 WHERE o.region_code = 'EMEA';
 ```
