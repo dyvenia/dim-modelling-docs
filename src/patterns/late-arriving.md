@@ -8,11 +8,11 @@ For example, an order fact arrives with `customer_id = 12345`, but the matching 
 
 This is common when facts and dimensions come through separate pipelines, source systems run on different schedules, or data arrives out of order.
 
-## General Rule
+The key comes from the dimension, never from the fact. Where the member doesn't exist yet, there is nothing to take — so the fact points at **Unknown** until there is.
+
+## Recommended Approach
 
 Don't block the fact load just because the dimension member is missing. Load the fact, let it rest on the reserved **Unknown** member, and let it resolve once the dimension catches up.
-
-One part of this is not a matter of preference: **the fact does not build its own keys.** It takes the key from the dimension. Where the member does not exist yet, there is simply nothing to take, and the fact points at Unknown until there is.
 
 > Load the fact now, leave it unresolved, and let the next run resolve it once the member exists.
 
@@ -49,7 +49,7 @@ A few situations call for something slightly different.
 
 **Facts are never reprocessed.** Nothing resolves the row on its own, so the correction has to be deliberate. The tests still surface it, and the fix is **targeted re-resolution**: find the rows still on Unknown, check whether the dimension now holds their member, and update the key column on the ones that resolve. It writes nothing to the dimension, and running it again changes nothing the second time.
 
-That needs the original business key to be reachable, and it usually already is — a fact carries its document or line identifier as a degenerate dimension, and staging holds the full source row behind it. Where staging doesn't reach back far enough, keep the business key on the fact as a degenerate column, for the few dimensions that actually arrive late. Only where it cannot be reached at all does the classic **inferred member** apply: a stub row in the dimension carrying the business key, keyed with exactly the same rule as a real row, and enriched once the details arrive.
+That needs the original business key to be reachable, and it usually already is — a fact carries its document or line identifier as a degenerate dimension, and staging holds the full source row behind it. Where staging doesn't reach back far enough, keep the business key on the fact as a degenerate column, for the few dimensions that actually arrive late. Where the key can't be reached at all, an **inferred member** is an option (see below).
 
 **The fact shouldn't load at all.** Where a fact is invalid without its member — regulatory reporting that requires an approved legal entity, for instance — hold it in staging until the dimension arrives.
 
@@ -62,6 +62,12 @@ That needs the original business key to be reachable, and it usually already is 
 A missing member isn't always a late-arriving one. If a fact has no customer information and never will, it belongs on the Unknown member permanently — that is its final state, not a waiting room.
 
 The catch is that on day one both look identical: a fact resting on Unknown because its member is still in transit looks exactly like a fact whose member will never exist. Late-arriving means *coming later*; unknown means *never coming* — and it is the daily tests, not the load, that tell them apart.
+
+## Inferred Members: An Alternative
+
+Instead of resting the fact on Unknown and resolving it later, write a stub row to the dimension carrying the business key — keyed with the same rule as a real row, enriched once the details arrive.
+
+Trade-off: simpler downstream joins and no dependency on a reprocessing window, at the cost of provisional rows to track and enrich, plus a second mechanism to maintain. We still default to Unknown + reprocessing, but this is a reasonable choice where the business key can't be reached from the fact or staging, or where consumers can't tolerate facts sitting on Unknown.
 
 ## Common Pitfalls
 
@@ -76,7 +82,7 @@ The catch is that on day one both look identical: a fact resting on Unknown beca
 - The key comes from the dimension, never from the fact.
 - Resolution happens on the next run, so the reload window has to be longer than the expected dimension lag.
 - Test unresolved rows daily. A row that clears is normal; one that doesn't is a signal.
-- Where facts are never reprocessed, correct them with targeted re-resolution, using the business key from staging or a degenerate column. An inferred member is the established fallback where that key cannot be reached.
+- Where facts are never reprocessed, correct them with targeted re-resolution, using the business key from staging or a degenerate column. An inferred member is an alternative with different trade-offs — simpler joins and no reload-window dependency, at the cost of provisional dimension rows.
 
 ## Related
 
