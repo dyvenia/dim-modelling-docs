@@ -32,7 +32,7 @@ A separate dimension should not be created solely to assign a surrogate key to s
 For example, a billing item fact may contain:
 
 ```text
-billing_document_sk
+billing_document_id
 billing_document_number
 billing_document_item
 customer_sk
@@ -57,6 +57,10 @@ it would have essentially the same grain as the billing fact and, in many cases,
 The dimension would largely duplicate identifiers already available in the fact while adding no meaningful descriptive information. It would also introduce an additional table and join without providing additional dimensional context.
 
 In this case, the transaction identifiers should remain directly in the fact.
+
+Where a technical identifier is required for a degenerate dimension, the recommended approach is to use a suffix such as `_id` rather than `_sk`.
+
+The `_sk` suffix should be reserved for surrogate keys that reference dimension tables.
 
 ## When to Use
 
@@ -103,7 +107,7 @@ A billing item fact may look as follows:
 ```text
 facts.fct_billing
 
-billing_document_sk
+billing_document_id
 billing_document_number
 billing_document_item
 billing_date_sk
@@ -126,6 +130,7 @@ Here:
 * `currency_sk` references the currency dimension.
 * `billing_document_number` is stored directly in the fact as a degenerate dimension.
 * `billing_document_item` identifies the individual transaction line and forms part of the natural fact grain.
+* `billing_document_id` may be used as a standardized technical identifier for the billing document where such an identifier is needed.
 
 The document identifier can then be used directly for analysis:
 
@@ -151,20 +156,25 @@ This allows the dimensional model to retain a direct connection to the source tr
 
 ### Technical Keys
 
-A fact may still contain a standardized technical key for a degenerate dimension.
+A degenerate dimension does not require a surrogate key because there is no separate dimension table to reference.
+
+Where a standardized technical identifier is useful, for example for uniqueness, joins between modeled objects, or consistent identification across processing steps, an `_id` column may be used.
 
 For example:
 
 ```text
-billing_document_sk
+billing_document_id
 billing_document_number
 ```
 
-The `billing_document_sk` may be generated from the business identifier according to the modeling standard, for example using a stable hash or another standardized key-generation method.
+`billing_document_id` may be generated from the business identifier using the standard key-generation approach.
 
-In this case, the key does not necessarily represent a foreign key to a physical dimension table. It can instead act as a standardized technical identifier for the business transaction.
+The recommended naming convention is:
 
-The presence of a `_sk` column therefore does not by itself mean that a corresponding dimension table must exist.
+* `_sk` for surrogate keys referencing dimension tables
+* `_id` for technical identifiers that do not reference a dimension
+
+This keeps the relationship between facts and dimensions explicit and avoids implying that every technical identifier has a corresponding dimension table.
 
 ### Fact Grain
 
@@ -201,5 +211,6 @@ This does not automatically mean that a document-level dimension must be created
 * They are most appropriate when the identifier is useful but has no meaningful descriptive attributes of its own.
 * They are commonly used for document numbers such as invoices, orders, shipments, and purchase orders.
 * A separate dimension should not be created solely to hold the identifier and assign it a surrogate key.
-* A technical `_key` may still be retained even when no physical dimension table exists.
+* `_sk` should be reserved for surrogate keys that reference dimension tables.
+* `_id` can be used for technical identifiers that do not reference a dimension.
 * Degenerate dimensions are a narrow exception and should not be used to place ordinary descriptive dimension attributes or measures directly in fact tables.
