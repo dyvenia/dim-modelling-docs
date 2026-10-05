@@ -34,15 +34,15 @@ A different approach may be more appropriate when the data doesn't represent a m
 3. **Identify the facts.** Add the numeric measures relevant to the process, favoring additive measures (quantities, amounts) over derived or non-additive ones (percentages, ratios, averages).
 4. **Classify additivity.** For each fact, determine whether it is additive, semi-additive, or non-additive, and document this — it determines how the fact can safely be aggregated.
 5. **Handle special cases explicitly.** Use surrogate "not applicable" dimension rows instead of NULLs where the absence of a value carries business meaning (e.g., a `promotion_key = -1` row for "no promotion applied," rather than a NULL foreign key).
-6. **Assign Surrogate Keys** The assignment of surrogate key is important to identify each row. Even though it is warehouse-generated, it gives business information about each transaction.
+6. **Assign Surrogate Keys** The assignment of surrogate key is important to identify each row. Even though it is warehouse-generated at the same level as analytics, it gives business information about each transaction. For business clarity, it is important to have same naming convention for surrogate keys; e.g., We use _sk as suffix as shown in the below table. (For more, See [Dimension](./dimension.md) and [Kimball Keys Definitions](./kimball-keys.md))
 
 **Example:** A retail sales line-item fact table might look like this:
 
-| order_number | order_line_number | order_date_key | customer_key | product_key | quantity_sold_units | net_sales_amount_usd | cost_amount_usd |
-|---|---|---|---|---|---|---|---|
-| 100234 | 1 | 20260115 | 4821 | 9931 | 2 | 59.98 | 32.00 |
-| 100234 | 2 | 20260115 | 4821 | 9931 | 4 | 119.96 | 64.00 |
-| 1002378 | 2 | 20261005 | 6758 | 3427 | 4 | 210.89 | 75.80 |
+| order_data_sk | order_number | order_line_number | order_date_key | customer_key | product_key | quantity_sold_units | net_sales_amount_usd | cost_amount_usd |
+|---|---|---|---|---|---|---|---|---|
+ 58374291 | 100234 | 1 | 20260115 | 4821 | 9931 | 2 | 59.98 | 32.00 |
+| 91638504 | 100234 | 2 | 20260115 | 4821 | 9931 | 4 | 119.96 | 64.00 |
+| 27461983| 1002378 | 2 | 20261005 | 6758 | 3427 | 4 | 210.89 | 75.80 |
 
 
 Here, the grain is "one row per product line item per sales order." `quantity_sold_units`, `net_sales_amount_usd`, and `cost_amount_usd` are all additive facts that can be safely summed across any combination of dimensions — by customer, by product, by date, or all three.
