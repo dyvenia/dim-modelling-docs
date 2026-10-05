@@ -8,7 +8,7 @@ A fact table represents a business process at a defined grain and records the me
 They store the measurable, quantitative data associated with a business process or event  while the surrounding dimension tables provide the descriptive context. A fact table is typically narrow but very long, growing continuously as new business events occur, and it connects to dimensions through foreign keys. 
 
 
-**Structure and grain**
+## Structure and grain
 The grain of a fact table — the precise definition of what a single row represents — must be declared before any other design decision is made, and every column in the table must be true to that grain. Once the grain is set, the table should contain:
 
 - **Foreign keys** to the relevant conformed dimensions
@@ -16,7 +16,7 @@ The grain of a fact table — the precise definition of what a single row repres
 
 This is guidance rather than a rigid template: the exact set of dimensions, the type of fact table, and the handling of edge cases will vary by business process. What should not vary is the discipline of declaring the grain explicitly and keeping every row and column consistent with it.
 
-**Business usage of fact tables**
+## Business usage of fact tables
 Fact table modelling is the right approach whenever you need to analyze a measurable business process — sales, orders, shipments, support tickets, inventory levels, and similar events or states. Which type of fact table to use depends on the nature of the process:
 
 - **Transaction fact tables** — when you need the finest-grained record of individual events (e.g., each sales transaction). This is the most common and most granular pattern, and the default choice unless there's a specific reason to aggregate further.
@@ -27,7 +27,7 @@ Fact table modelling is the right approach whenever you need to analyze a measur
 A different approach may be more appropriate when the data doesn't represent a measurable business process at all — purely descriptive or reference data belongs in a dimension table, not a fact table. Similarly, if the "measure" you want to report on is a ratio or percentage rather than an additive quantity, it typically shouldn't be stored directly as a fact column — see Implementation Considerations below.
 
 
-**Steps of designing a fact table**
+## Steps of designing a fact table
 
 1. **Declare the grain.** Write a single, unambiguous sentence describing what one row represents (e.g., "one row = one product line item on one customer sales order"). This statement should be documented, not just implied by the design.
 2. **Identify the dimensions.** Determine which conformed dimensions apply at that grain (date, customer, product, store, etc.) and add them as foreign keys, using consistent surrogate key naming across all fact tables (e.g., `customer_key` always refers to `dim_customer.customer_key`).
@@ -53,15 +53,18 @@ Here, the grain is "one row per product line item per sales order." `quantity_so
  - **Documentation and metadata.** The grain, additivity classification, and business definitions should be captured as table/column-level metadata (e.g., in a data dictionary, dbt `schema.yml`, or semantic layer) rather than left as tribal knowledge. This is increasingly important as more tools — including AI agents — consume the schema directly.
  - **Performance and volume.** Fact tables grow continuously and can become very large; partitioning (typically by date), appropriate indexing, and periodic archiving strategies should be considered as part of the physical design, separate from the logical grain decision. 
 
-**Designing a fact table**
-A fact table is the foundation for reliable, consistent reporting and analytics. A poorly defined fact table consists of these:
-1. Ambiguous grain
-2. mixed level of detail
-3. non-additive measures stored like an additive measure. 
+## Designing a fact table
+A fact table is the foundation for reliable, consistent reporting and analytics. A poorly defined fact table typically shows one or more of these issues:
+
+1. Ambiguous grain — the grain isn't documented, or isn't the same for every row, so it's unclear what a single row actually represents. This makes it easy to double-count or under-aggregate without realizing it.
+
+2. Mixed level of detail — some rows represent individual events while others are pre-summarized (e.g. daily totals mixed with individual transactions) within the same table. Aggregating across these rows produces incorrect results, since the same measure means different things at different levels.
+
+3. Non-additive measures stored and treated as additive — ratios, percentages, or averages (e.g. a tax rate or margin percentage) are summed or averaged directly across rows, rather than being recalculated from their underlying additive components. This produces numbers that look plausible but are mathematically wrong.
 
 A poorly defined fact table can lead to duplicates, incorrect aggregations and inconsistent answers to the same question depending on the tools used by different teams. AI-drive tools and agents lack the intuition to catch mistakes which makes it more important to have a well and correctly designed fact table. 
 
-
+## Key Takeaways
 
 
 
