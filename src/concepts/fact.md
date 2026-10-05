@@ -65,7 +65,11 @@ A fact table is the foundation for reliable, consistent reporting and analytics.
 A poorly defined fact table can lead to duplicates, incorrect aggregations and inconsistent answers to the same question depending on the tools used by different teams. AI-drive tools and agents lack the intuition to catch mistakes which makes it more important to have a well and correctly designed fact table. 
 
 ## Key Takeaways
-
+- Declare the grain before choosing dimensions or measures, and keep every row consistent with it.
+Use additive measures where possible; derive ratios from additive components rather than storing or aggregating them directly.
+- Avoid ambiguous grain, mixed levels of detail, and treating non-additive measures as additive.
+- Use the _sk convention consistently for surrogate keys across fact tables.
+- Clear naming and documented metadata reduce ambiguity for both analysts and AI query tools.
 
 
 
