@@ -68,7 +68,7 @@ A poorly defined fact table can lead to duplicates, incorrect aggregations and i
 - Declare the grain before choosing dimensions or measures, and keep every row consistent with it.
 Use additive measures where possible; derive ratios from additive components rather than storing or aggregating them directly.
 - Avoid ambiguous grain, mixed levels of detail, and treating non-additive measures as additive.
-- Use the _sk convention consistently for surrogate keys across fact tables.
+<!-- - Use the _sk convention consistently for surrogate keys across fact tables. -->
 - Clear naming and documented metadata reduce ambiguity for both analysts and AI query tools.
 
 
