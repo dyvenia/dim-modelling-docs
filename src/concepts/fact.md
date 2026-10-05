@@ -74,7 +74,8 @@ Use additive measures where possible; derive ratios from additive components rat
 - Avoid ambiguous grain, mixed levels of detail, and treating non-additive measures as additive.
 - Clear naming and documented metadata reduce ambiguity for both analysts and AI query tools.
 
-
-
-
-
+## Related
+- [Grain](../definitions/grain.md) — the atomic level of a fact table
+- [Slowly Changing Dimension](../definitions/slowly-changing-dimension.md) — tracking attribute history
+- [Star Schema](./star-schema.md) — how dimensions surround a fact table
+- [Kimball Keys Definitions](./kimball-keys.md) — natural, surrogate, durable, and foreign keys
