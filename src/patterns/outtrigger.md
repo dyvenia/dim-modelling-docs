@@ -1,99 +1,107 @@
 # Outrigger
 
-An outrigger is a secondary dimension table that joins to another dimension table rather than directly to a fact table. While pure Kimball dimensional modeling strongly prefers flat, denormalized tables, outriggers exist to solve specific data modeling edge cases without cluttering or degrading your main data model.
+## Overview
 
-## General Rule
+An outrigger is a secondary dimension table that joins to a primary dimension table rather than connecting directly to a fact table.
 
-The baseline Kimball rule is to **denormalize whenever possible**. Attributes from related entities should ideally be collapsed directly into the primary dimension table to maintain a clean star schema. Outriggers are permissible exceptions, but their use must always be intentionally justified.
+It is important to distinguish an outrigger from general snowflaking. While snowflaking typically decomposes a full multi-level hierarchy (such as Product → Subcategory → Category) into normalized tables, an outrigger is specifically a standalone secondary dimension referenced by a primary dimension—often to hold reusable or distinct attribute groups.
+
+## Recommended Approach
+
+The baseline approach in Kimball modeling is to prefer flat, denormalized dimensions. Attributes from related entities should ideally be collapsed directly into the primary dimension table to keep the star schema clean and intuitive.
+
+Outriggers should generally be introduced only where the additional structure provides a clear modeling benefit. Rather than treating this as a rigid rule with a fixed list of permitted cases, evaluate the trade-offs between schema simplicity and data design efficiency for your specific use case.
 
 ## When to Use
 
-Denormalization is the preferred default because keeping attributes in a single table maintains a pure star schema, maximizes storage/query efficiency, and simplifies BI reporting hierarchies.
+Denormalization remains the preferred default because keeping attributes in a single table maximizes query efficiency and simplifies reporting for business users.
 
-However, using an outrigger is justified in the following scenarios:
+However, introducing an outrigger can be appropriate in scenarios such as:
 
-* Differing Rates of Change: When a small subset of attributes changes far more frequently than the primary dimension, splitting them into an outrigger prevents excessive row growth under Slowly Changing Dimension (SCD) Type 2 tracking.
+- **Shared/Reusable Attribute Sets:** When a cohesive block of attributes applies identically across multiple distinct dimensions—such as a single `dim_geography` table referenced by both `dim_customer` and `dim_store`.
+- **High vs. Low Cardinality Mismatches:** When a primary dimension contains millions of rows, but secondary descriptive details repeat across a small, relatively static set of entities.
 
-* Shared/Reusable Attribute Sets: When a complex block of attributes (like geographic regions or census demographics) applies identically to multiple distinct dimensions (e.g., both Customer and Store).
+## How It Works
 
-* High vs. Low Cardinality Mismatch: When a primary dimension contains millions of rows, but secondary descriptive data repeats across small, static groups.
+Below is an example showing the default flat dimension alongside a secondary geography outrigger model.
 
-## How it works
+### 1. Recommended Flat Approach (Denormalized)
 
-Below is a comparison showing the standard denormalized model alongside an outrigger approach.
-
-_1. Standard Approach (Denormalized / Flat Dimension)_
-
-By default, product attributes (subcategory and category) live directly inside dim_product.
-
+Geographic attributes sit directly inside `dim_customer`.
 
 ```mermaid
 erDiagram
-    dim_product ||--o{ fact_sales : "product_key"
+    dim_customer ||--o{ fact_sales : "places"
 
-    fact_sales {
-        int product_key FK
-        int quantity
-        decimal amount
+    dim_customer {
+        int customer_sk PK
+        string customer_name
+        string city
+        string state
+        string country
+        string postal_code
     }
 
-    dim_product {
-        int product_key PK
-        string sku_name
-        string sub_category
-        string category
+    fact_sales {
+        int customer_sk FK
+        int quantity
+        decimal amount
     }
 ```
 
+### 2. Outrigger Approach (Shared Secondary Dimension)
 
-_2. Outrigger Approach (Normalized Sub-dimensions)_
-
-When justified, hierarchy levels are split into separate outrigger dimensions linked by foreign keys.
-
-
+`dim_customer` references a distinct `dim_geography` table, which can also be referenced independently by other primary dimensions in the warehouse.
 
 ```mermaid
+%%{init: {'layoutDirection': 'LR'}}%%
 erDiagram
-    dim_product ||--o{ fact_sales : "product_key"
-    dim_product_subcategory ||--o{ dim_product : "sub_category_key"
-    dim_product_category ||--o{ dim_product_subcategory : "category_key"
+    dim_geography ||--o{ dim_customer : "located_in"
+    dim_customer ||--o{ fact_sales : "places"
+
+    dim_geography {
+        int geography_sk PK
+        string city
+        string state
+        string country
+        string postal_code
+    }
+
+    dim_customer {
+        int customer_sk PK
+        string customer_name
+        int geography_sk FK
+    }
 
     fact_sales {
-        int product_key FK
+        int customer_sk FK
         int quantity
         decimal amount
-    }
-
-    dim_product {
-        int product_key PK
-        string sku_name
-        int sub_category_key FK
-    }
-
-    dim_product_subcategory {
-        int sub_category_key PK
-        string sub_category
-        int category_key FK
-    }
-
-    dim_product_category {
-        int category_key PK
-        string category
     }
 ```
 
 ## Implementation Considerations
 
-* Query Performance: Outriggers introduce extra joins. While modern cloud data warehouses handle joins well, traversing deep outrigger chains can increase query latency for end-user reporting.
+- **Slowly Changing Dimensions (SCD Interaction):**  
+  Handling updates in an outrigger requires careful architectural decisions depending on how history is tracked:
+  - **SCD Type 1 (Overwrite):** If the outrigger attributes change and are overwritten (e.g., correcting a postal code error in `dim_geography`), all primary dimensions referencing that outrigger immediately inherit the change without touching the primary tables.
+  - **SCD Type 2 (Track History):** If an outrigger generates a new row with a new surrogate key when an attribute changes, you must decide how the primary dimension reacts:
+    - *Option A (Update FK):* Overwrite the foreign key (`geography_sk`) in the existing primary dimension record to point to the new outrigger key. This updates current context without duplicating primary rows.
+    - *Option B (Cascading Type 2):* Insert a new Type 2 record in the primary dimension with the updated outrigger key. Be cautious: if outrigger attributes change frequently, this causes cascading row explosion across all primary dimensions that link to it.
+  - *Alternative Pattern:* If an outrigger's attributes change rapidly relative to the primary entity, decouple them entirely by pulling those attributes into a **mini-dimension** tied directly to the fact table instead.
 
-* BI Tool Usability: Overusing outriggers turns a simple star schema into a complex snowflake schema, making self-service BI queries harder for non-technical business users.
+- **Query Complexity & BI Usability:** Joining across primary dimensions to an outrigger adds join depth. While cloud warehouses handle this performantly, overusing outriggers creates a complex snowflake schema that makes self-service reporting harder for non-technical users.
 
-* Maintenance Overhead: Outriggers require managing additional surrogate keys and ETL loading steps to handle key assignments across dependent tables.
+- **Maintenance Overhead:** Outriggers require managing additional surrogate keys and orchestrating ETL dependencies—outriggers must always be processed and loaded before primary dimensions can assign foreign keys.
 
 ## Key Takeaways
 
-* Default to flat, denormalized dimensions inside your star schema whenever possible.
+- Prefer flat, denormalized dimensions by default to keep your star schema clean and easy to query.
+- Consider an outrigger where maintaining related attributes separately provides a clear modeling benefit, such as shared reusability across dimensions or independent management.
+- Distinguish outriggers from snowflaked hierarchies, and carefully evaluate SCD historical tracking requirements before separating attributes into secondary tables.
 
-* Use outriggers sparingly—reserve them for reusability across dimensions or preventing massive SCD Type 2 table bloat.
+## Related
 
-* Avoid building deep outrigger chains (more than 1–2 layers deep) to prevent turning your star schema into an overly complex snowflake model.
+- [Dimension](../concepts/dimension.md): A general explanation of dimensional tables
+- [Keys](../concepts/kimball-keys.md): How to link facts and dimensions
+- [Slowly Changing Dimensions (SCD)](../conventions/slowly-changing-dimension.md): Strategies for tracking attribute changes over time (Type 1, Type 2, and Type 3)
