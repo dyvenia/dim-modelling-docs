@@ -92,7 +92,7 @@ matching.
 
 ## See also
 
-- [Key Generation](../conventions/key-strategy.md) — how surrogate keys are produced
+- [Key Generation](../conventions/key-generation.md) — how surrogate keys are produced
 - [Kimball Keys Definitions](../concepts/kimball-keys.md) — natural, surrogate, durable, and foreign keys
 - [Unknown member](../patterns/unknown.md) — the reserved dimension row
 - [Union](./union.md) — the step that feeds this transformation
