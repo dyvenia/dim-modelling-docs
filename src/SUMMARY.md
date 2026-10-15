@@ -6,13 +6,13 @@
    - [Fact](./concepts/fact.md)
    - [Grain](./concepts/grain.md)
    - [Star Schema](./concepts/star-schema.md)
-   - [Keys (surrogate, natural, foreign)](./concepts/kimball-keys.md)
+   - [Kimball Keys Definitions](./concepts/kimball-keys.md)
 
 # Transformations
    - [Prepare / standardise](./transformations/prepare.md)
    - [Join](./transformations/join.md)
    - [Union](./transformations/union.md)
-   - [Keys & Unknown member](./transformations/keys-assignments.md)
+   - [Key Assignment](./transformations/key-assignment.md)
 
 # Patterns & Edge Cases
    - [Unknown member](./patterns/unknown.md)
@@ -26,7 +26,7 @@
 # Conventions
    - [Slowly Changing Dimensions (SCD)](./conventions/slowly-changing-dimension.md)
    - [Naming (_sk, _code, _number, is_, vw_, map_)](./conventions/naming.md)
-   - [Key strategy (hash hybrid, surrogate keys)](./conventions/key-strategy.md)
+   - [Key Generation](./conventions/key-generation.md)
 
 # [Reference]()
    - [Dimensions catalogue]()
