@@ -20,7 +20,7 @@ flowchart LR
 
 ### Resolve keys through the dimension
 
-Following Kimball's surrogate key assignment logic, the recommended approach is for
+Following Kimball's **surrogate key pipeline**, the recommended approach is for
 the fact to look up each dimension key on the natural key, rather than computing
 it itself. Even with deterministic hashes, this:
 
