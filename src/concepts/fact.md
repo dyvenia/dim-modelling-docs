@@ -30,7 +30,7 @@ A different approach may be more appropriate when the data doesn't represent a m
 ## Steps of designing a fact table
 
 1. **Declare the grain first.** Write a single, unambiguous sentence describing what one row represents (e.g., "one row = one product line item on one customer sales order"). This statement should be documented, not just implied by the design. It is important to define the business process which is essential for deciding the grain of the Fact table. This is a primary step before identifying dimensions and fact tables.
-2. **Identify the dimensions.** Determine which conformed dimensions apply at that grain (date, customer, product, store, etc.) and add them as foreign keys, using consistent surrogate key naming across all fact tables (e.g., `customer_key` always refers to `dim_customer.customer_key`).
+2. **Identify the dimensions.** Determine which conformed dimensions apply at that grain (date, customer, product, store, etc.) and add them as foreign keys, using consistent surrogate key naming across all fact tables (e.g., `customer_sk` always refers to `dim_customer.customer_sk`).
 3. **Identify the facts.** Add the numeric measures relevant to the process, favoring additive measures (quantities, amounts) over derived or non-additive ones (percentages, ratios, averages).
 4. **Classify additivity.** For each fact, determine whether it is additive, semi-additive, or non-additive, and document this — it determines how the fact can safely be aggregated.
 5. **Handle special cases explicitly.** Use surrogate "not applicable" dimension rows instead of NULLs where the absence of a value carries business meaning (e.g., a `promotion_key = -1` row for "no promotion applied," rather than a NULL foreign key). 
