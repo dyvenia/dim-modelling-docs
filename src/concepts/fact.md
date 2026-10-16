@@ -41,8 +41,8 @@ A different approach may be more appropriate when the data doesn't represent a m
 
 | order_data_sk | order_number | order_line_number | order_date_sk | customer_sk | product_sk | quantity_sold_units | net_sales_amount_usd | cost_amount_usd |
 |---|---|---|---|---|---|---|---|---|
- 58374291 | 100234 | 1 | 20260115 | 4821 | 9931 | 2 | 59.98 | 32.00 |
-| 91638504 | 100234 | 2 | 20260115 | 4821 | 9931 | 4 | 119.96 | 64.00 |
+ 58374291 | 0100234 | 1 | 20260115 | 4821 | 9931 | 2 | 59.98 | 32.00 |
+| 91638504 | 0100234 | 2 | 20260115 | 4821 | 9931 | 4 | 119.96 | 64.00 |
 | 27461983| 1002378 | 2 | 20261005 | 6758 | 3427 | 4 | 210.89 | 75.80 |
 
 
