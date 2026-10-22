@@ -75,8 +75,14 @@ version has its own key. Match on the natural key **and** the event date:
 ```sql
 LEFT JOIN dim_customer AS d
     ON d.customer_nk = f.customer_nk
-    AND f.order_date BETWEEN d.valid_from AND d.valid_to
+    AND f.order_date >= d.valid_from
+    AND f.order_date <  d.valid_to
 ```
+
+> **Note:** the comparison must match how validity periods are defined. The
+> example assumes `valid_to` is exclusive (equal to the next version's
+> `valid_from`). If `valid_to` is inclusive (the day before the next version
+> starts), use `<= d.valid_to` instead.
 
 Versions should not overlap (fan-out), leave gaps, or have `NULL` validity dates
 (false Unknowns).

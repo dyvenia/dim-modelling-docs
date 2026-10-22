@@ -2,8 +2,9 @@
 
 ## Overview
 
-Each table generates **its own** surrogate key. A dimension owns its keys; facts
-resolve them by lookup (see [Key Assignment](../transformations/key-assignment.md)).
+Each dimension generates and owns its own surrogate key; facts resolve them by
+lookup (see [Key Assignment](../transformations/key-assignment.md)). Where a fact
+requires a separate row identifier, a fact can generate its own key.
 Key types are defined in [Kimball Keys Definitions](../concepts/kimball-keys.md).
 
 ## Sequence or hash
