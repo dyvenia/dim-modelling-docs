@@ -114,10 +114,18 @@ flowchart LR
 In the fact load, the lookup joins on the natural-key columns and takes the resolved key from the dimension — a fact never builds its own dimension keys (see [Resolution engines](https://dimensional-modelling.dyvenia.com/patterns/resolution-engines.html)). Because `dim_standard_cost` keeps one row per cost version, the event date resolves which version applies:
 
 ```sql
+WITH
+
+unknown_member as (
+    SELECT standard_cost_sk
+    FROM dimensions.dim_standard_cost
+    WHERE material_number = 'UNKNOWN'
+)
+
 SELECT
     f.invoice_number,
     f.invoice_line_number,
-    COALESCE(d.standard_cost_sk, -1) as standard_cost_sk,
+    COALESCE(d.standard_cost_sk, unk.standard_cost_sk) as standard_cost_sk,
     f.sales_amount
 FROM staging.invoice_lines as f
 LEFT JOIN dimensions.dim_standard_cost as d
@@ -125,10 +133,11 @@ LEFT JOIN dimensions.dim_standard_cost as d
     AND f.material_number = d.material_number
     AND f.invoice_date >= d.cost_effective_from
     AND f.invoice_date < d.cost_effective_to
+CROSS JOIN unknown_member as unk
 ;
 ```
 
-The `LEFT JOIN` and `COALESCE` are the standard [Unknown member](https://dimensional-modelling.dyvenia.com/patterns/unknown.html) treatment. The value comes from the [reserved special members](https://dimensional-modelling.dyvenia.com/concepts/kimball-keys.html) — `-1` for Unknown, which is what [Standard Cost](https://dimensional-modelling.dyvenia.com/references/dimensions/standard-cost.html) specifies for an unresolved cost. Once assigned, the fact carries only `standard_cost_sk`.
+The `LEFT JOIN` and `COALESCE` are the standard [Unknown member](https://dimensional-modelling.dyvenia.com/patterns/unknown.html) treatment. The fallback is the Unknown member's own surrogate key: the dimension generates it like any other key, and the fact resolves and uses it rather than building one. See that page for the reserved code and how the row is added. Once assigned, the fact carries only `standard_cost_sk`.
 
 This substitution is the **surrogate key assignment step**, and it has one ordering consequence worth stating: dimensions load before facts. The dimension is the only legitimate source of the key, and a composite has more columns that can be stale, so the ordering is less forgiving than with a single-column key.
 
@@ -168,7 +177,7 @@ Failure modes that the sections above do not spell out:
 ## Related
 
 * [Keys](https://dimensional-modelling.dyvenia.com/transformations/keys-assignments.html) — the concatenate-and-hash rule this page applies
-* [Keys (surrogate, natural, foreign)](https://dimensional-modelling.dyvenia.com/concepts/kimball-keys.html) — key types, durable keys, and the reserved special members
+* [Keys (surrogate, natural, foreign)](https://dimensional-modelling.dyvenia.com/concepts/kimball-keys.html) — key types and durable keys
 * [Standard Cost](https://dimensional-modelling.dyvenia.com/references/dimensions/standard-cost.html) — dimension with a multi-part natural key and a durable key
 * [Invoice Lines](https://dimensional-modelling.dyvenia.com/references/facts/invoice_lines.html) — fact whose grain is a tuple
 * [Prepare / standardise](https://dimensional-modelling.dyvenia.com/transformations/prepare.html) — where components are cleaned
