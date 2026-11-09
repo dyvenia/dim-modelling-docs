@@ -3,13 +3,14 @@
 A **fact** table is the center table of the [star schema](./star-schema.md) in Kimball methodology. This table consists of the quantitative measurements of business value such as the sales, orders, backlogs, etc. 
 
 ## What is a fact?
-A fact table represents a business process at a defined grain and records the measurements, events, or states associated with that process. It connects to dimensions that provide descriptive context. Reporting, semantic models, and business views are typically built on top of fact tables, rather than the fact table itself being the end deliverable. 
+A fact table represents a business process at a defined grain and records the measurements, events, or states associated with that process. It connects to dimensions that provide descriptive context. 
+<!-- Reporting, semantic models, and business views are typically built on top of fact tables, rather than the fact table itself being the end deliverable.  -->
 
-They store the measurable, quantitative data associated with a business process or event  while the surrounding dimension tables provide the descriptive context. A fact table is typically narrow but very long, growing continuously as new business events occur, and it connects to dimensions through foreign keys. 
+They store the measurable and quantitative, or qualitative data associated with a business process or event  while the surrounding dimension tables provide the descriptive context. A fact table is typically narrow but very long, growing continuously as new business events occur, and it connects to dimensions through foreign keys. 
 
 
-## Structure and grain
-The grain of a fact table — the precise definition of what a single row represents — must be declared before any other design decision is made, and every column in the table must be true to that grain. Once the grain is set, the table should contain:
+## Recommended Approach
+The grain of a fact table — the precise definition of what a single row represents depending on business needs and process — must be declared before any other design decision is made, and every column in the table must be true to that grain. Once the grain is set, the table should contain:
 
 - **Foreign keys** to the relevant conformed dimensions
 - **Measures (facts)** that are numeric and, wherever possible, additive
