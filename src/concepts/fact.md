@@ -3,7 +3,7 @@
 A **fact** table is the center table of the [star schema](./star-schema.md) in Kimball methodology. This table consists of the quantitative measurements of business value such as the sales, orders, backlogs, etc. 
 
 ## What is a fact?
-A fact table represents a business process at a defined grain and records the measurements, events, or states associated with that process. It connects to dimensions that provide descriptive context. Reporting, semantic models, and business views are typically built on top of fact tables, rather than the fact table itself being the end deliverable.
+A fact table represents a business process at a defined grain and records the measurements, events, or states associated with that process. It connects to dimensions that provide descriptive context. Reporting, semantic models, and business views are typically built on top of fact tables, rather than the fact table itself being the end deliverable. 
 
 They store the measurable, quantitative data associated with a business process or event  while the surrounding dimension tables provide the descriptive context. A fact table is typically narrow but very long, growing continuously as new business events occur, and it connects to dimensions through foreign keys. 
 
@@ -32,8 +32,9 @@ A different approach may be more appropriate when the data doesn't represent a m
 1. **Declare the grain first.** Write a single, unambiguous sentence describing what one row represents (e.g., "one row = one product line item on one customer sales order"). This statement should be documented, not just implied by the design. It is important to define the business process which is essential for deciding the grain of the Fact table. This is a primary step before identifying dimensions and fact tables.
 2. **Identify the dimensions.** Determine which conformed dimensions apply at that grain (date, customer, product, store, etc.) and add them as foreign keys, using consistent surrogate key naming across all fact tables (e.g., `customer_sk` always refers to `dim_customer.customer_sk`).
 3. **Identify the facts.** Add the numeric measures relevant to the process, favoring additive measures (quantities, amounts) over derived or non-additive ones (percentages, ratios, averages).
-4. **Classify additivity.** For each fact, determine whether it is additive, semi-additive, or non-additive, and document this — it determines how the fact can safely be aggregated.
-5. **Handle special cases explicitly.** Use surrogate "not applicable" dimension rows instead of NULLs where the absence of a value carries business meaning (e.g., a `promotion_key = -1` row for "no promotion applied," rather than a NULL foreign key). 
+4. **Classify additivity.** For each fact, determine whether it is additive, semi-additive, or non-additive, and document this — it determines how the fact can safely be aggregated. There can also be factless facts. Refer to factless.md
+<!-- 5. **Handle special cases explicitly.** In special cases such as unknown or absence values for a parameter from dimension table,  -->
+<!-- Use surrogate "not applicable" dimension rows instead of NULLs where the absence of a value carries business meaning (e.g., a `promotion_key = -1` row for "no promotion applied," rather than a NULL foreign key).  -->
 <!-- In above point change in reference to patterns/unknown.md -->
 <!-- 6. **Assign Surrogate Keys** The assignment of surrogate key is important to identify each row. Even though it is warehouse-generated at the same level as analytics, it provides an identifier for each transaction. For business clarity, it is important to have same naming convention for surrogate keys; e.g., We use _sk as suffix as shown in the below table where order_data_sk is the row identifier for the fact table. In the below example, "order_date_sk", "customer_sk" and "product_sk" are identifiers of the rows of dimension tables from which the fact table is mapped out. (For more, See [Dimension](./dimension.md) and [Kimball Keys Definitions](./kimball-keys.md)) -->
 6. **Assign keys.** A fact table carries two kinds of surrogate keys, both purely technical identifiers with no business meaning:
