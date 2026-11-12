@@ -8,15 +8,11 @@ For example:
 
 | customer_sk                        | customer_number | customer_name    |
 | ---------------------------------- | --------------- | ---------------- |
-|                                  0 | UNKNOWN         | Unknown Customer |
-|                                 101| C10001          | Customer A       |
-|                                 102| C10002          | Customer B       |
+|          HASH('UNKNOWN', 'SYSTEM') | UNKNOWN         | Unknown Customer |
+|              HASH('C10001', 'SAP') | C10001          | Customer A       |
+|              HASH('C10002', 'SAP') | C10002          | Customer B       |
 
-A fact record with no valid customer would use:
-
-```text
-customer_sk = 0
-```
+A fact record with no valid customer would use the surrogate key belonging to the UNKNOWN member.
 
 ## Why an unknown member is needed
 
@@ -46,19 +42,8 @@ Every dimension referenced by a fact table should contain an unknown member.
 
 The unknown member should be added in the final dimension model as a predefined technical row, normally using `UNION ALL` with the regular dimension records. This ensures that the row is recreated consistently whenever the dimension is built or refreshed. Separate post-load inserts should be used only where the dimension loading strategy makes the union pattern impractical.
 
-The recommended approach is to use an integer-based surrogate key, generated using an agreed hash or another deterministic integer key-generation function.
-
-The standard unknown surrogate key should be:
-
-```text
-0
-```
-
-The same key-generation approach must be applied consistently across dimensions and facts.
-
-Depending on the data platform and its limitations, other approaches may also be used. For example, a platform may provide a different key-generation function or require a text-based hash such as MD5.
-
-The selected approach should remain deterministic and reproducible for the same business key and should be defined as part of the modeling standards.
+Reserved members should follow the same surrogate key-generation approach as regular dimension members. 
+The surrogate key should therefore be generated from the reserved business code.
 
 For example:
 
@@ -76,7 +61,7 @@ dimension_data as (
 
 unknown_member as (
     SELECT
-        0 as customer_sk,
+        HASH('UNKNOWN', 'SYSTEM') as customer_sk,
         'UNKNOWN' as customer_number,
         'Unknown Customer' as customer_name,
         'SYSTEM' as source_system
@@ -100,29 +85,51 @@ FROM dimension_data
 ;
 ```
 
+The exact key-generation function depends on the agreed modeling standard and the capabilities of the data platform. The important point is that reserved members follow the same deterministic key-generation approach as regular dimension members.
+
 ## Example fact lookup
 
 When building the fact table, the dimension lookup should use a `LEFT JOIN`.
 
-If no matching dimension member is found, the unknown surrogate key is assigned using `COALESCE`.
+If no matching dimension member is found, the fact should use the surrogate key of the Unknown member from the dimension.
+
+For example:
 
 ```sql
+WITH unknown_customer AS (
+
+    SELECT
+        customer_sk
+    FROM dimensions.dim_customer
+    WHERE customer_number = 'UNKNOWN'
+      AND source_system = 'SYSTEM'
+
+)
+
 SELECT
-    HASH(f.billing_document_number, f.billing_item_number) as billing_sk,
+    HASH(f.billing_document_number, f.billing_item_number) AS billing_sk,
     f.billing_document_number,
     f.billing_item_number,
-    COALESCE(d.customer_key, 0) as customer_sk,
+    COALESCE(
+        d.customer_sk,
+        u.customer_sk
+    ) AS customer_sk,
     f.net_amount
-FROM staging.billing_items as f
-LEFT JOIN dimensions.dim_customer as d
+FROM staging.billing_items AS f
+LEFT JOIN dimensions.dim_customer AS d
     ON f.customer_number = d.customer_number
     AND f.source_system = d.source_system
+CROSS JOIN unknown_customer AS u
 ;
 ```
 
 The `LEFT JOIN` keeps the fact record even when the dimension lookup fails.
 
-The `COALESCE` replaces the missing surrogate key with the unknown member key.
+The `CROSS JOIN` makes the surrogate key of the predefined Unknown member available to all fact records.
+
+The `COALESCE` then uses that key when no regular dimension member can be resolved.
+
+This also keeps ownership of the surrogate key in the dimension. The fact resolves the Unknown key from the dimension rather than hardcoding or independently generating it.
 
 ## Do not use NULL foreign keys
 
@@ -134,11 +141,7 @@ For example, avoid:
 customer_sk = NULL
 ```
 
-Use:
-
-```text
-customer_sk = 0
-```
+Use the surrogate key of the defined Unknown member instead.
 
 This provides several benefits:
 
@@ -179,7 +182,7 @@ Example:
 
 | customer_sk                        | customer_number | valid_from | valid_to   | is_current |
 | ---------------------------------- | --------------- | ---------- | ---------- | ---------- |
-|                                  0 | UNKNOWN         | 1900-01-01 | 9999-12-31 | 1          |
+|          HASH('UNKNOWN', 'SYSTEM') | UNKNOWN         | 1900-01-01 | 9999-12-31 | 1          |
 
 The unknown member:
 
@@ -194,7 +197,7 @@ The dates `1900-01-01` and `9999-12-31` are technical validity boundaries. They 
 
 When resolving an SCD Type 2 relationship, the fact load should first attempt to find the dimension version valid at the fact event date.
 
-If no valid historical dimension version is found, the fact is assigned to the permanent unknown member.
+If no valid historical dimension version is found, the fact is assigned to the permanent Unknown member.
 
 The unknown row does not need to be matched through the effective-date conditions. Its surrogate key is assigned as the fallback after the regular historical lookup fails.
 
