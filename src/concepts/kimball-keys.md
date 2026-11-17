@@ -1,19 +1,20 @@
 # Kimball Keys Definitions
 
 In the Kimball dimensional modelling approach, **keys** are the backbone that
-connect fact tables to their dimensions and that let us track history correctly.
-This page defines the key types you will encounter and the conventions we use for
-each.
+connect fact tables to their dimensions and that make it possible to track
+history correctly. This page defines the key types you will encounter. How
+surrogate keys are generated is covered in [Key Generation](../conventions/key-generation.md),
+and how facts obtain them in [Key Assignment](../transformations/key-assignment.md).
 
 ## Quick reference
 
-| Key | Lives in | Stable? | Meaningful? | Purpose |
-|-----|----------|---------|-------------|---------|
-| Natural key | Source system | Yes (in source) | Yes | Identifies a business entity in the source |
-| Durable / supernatural key | Dimension | Yes (forever) | No | Identifies an entity across all source changes |
-| Surrogate key | Dimension | Per row version | No | Primary key of a dimension row |
-| Foreign key | Fact | — | No | Points a fact row at a dimension row |
-| Degenerate dimension | Fact | Yes | Yes | Operational identifier with no dimension table |
+| Key                        | Lives in      | Stable?         | Meaningful? | Purpose                                        |
+| -------------------------- | ------------- | --------------- | ----------- | ---------------------------------------------- |
+| Natural key                | Source system | Yes (in source) | Yes         | Identifies a business entity in the source     |
+| Durable / supernatural key | Dimension     | Yes (forever)   | No          | Identifies an entity across all source changes |
+| Surrogate key              | Dimension     | Per row version | No          | Primary key of a dimension row                 |
+| Foreign key                | Fact          | —               | No          | Points a fact row at a dimension row           |
+| Degenerate dimension       | Fact          | Yes             | Yes         | Operational identifier with no dimension table |
 
 ---
 
@@ -48,30 +49,30 @@ customer_durable_key = 90231   -- one value for CUST-00417 across all versions
 
 ## Surrogate key
 
-A **meaningless, warehouse-generated** integer that serves as the **primary key**
+A **meaningless, warehouse-generated** value that serves as the **primary key**
 of a dimension table. Every row in the dimension — including every historical
 version of an entity — gets its own surrogate key.
 
-- Typically a monotonically increasing integer (`BIGINT`) or an identity column.
+- Can be a sequential integer or a deterministic hash; see
+  [Key Generation](../conventions/key-generation.md).
 - Carries no business meaning; never expose it to end users as a "real" id.
 - Decouples the warehouse from source-key changes and enables Type 2 history.
 
-> **Convention:** name surrogate keys `<entity>_sk`, e.g. `customer_sk`,
-> `product_sk`, `date_sk`.
+> **Convention:** see [Naming](../conventions/naming.md) for the `_sk` suffix.
 
 ```text
-customer_sk = 1048576   -- primary key of one specific version of a customer row
+customer_sk = "3f2a9c..."   -- primary key of one specific version of a customer row
 ```
 
 ### Why a surrogate key instead of the natural key?
 
-1. **Slowly changing dimensions (SCD Type 2).** When an attribute changes we add
-   a *new* row with a *new* surrogate key, preserving the old version.
-2. **Performance.** Single-column integer joins are faster and smaller than wide
-   or composite natural keys.
+1. **Slowly changing dimensions (SCD Type 2).** When an attribute changes, a
+   *new* row with a *new* surrogate key is added, preserving the old version.
+2. **Simpler joins.** A single-column key is easier to join on than a wide or
+   composite natural key. Kimball favours small integer keys for this reason.
 3. **Insulation.** Source-system key changes don't ripple into facts.
-4. **Late-arriving / unknown members.** Reserved surrogate values can represent
-   "Unknown" or "Not applicable" rows.
+4. **Special members.** Dedicated rows can represent "Unknown" or
+   "Not applicable".
 
 ## Foreign key
 
@@ -82,6 +83,9 @@ the join between the fact and that dimension.
 - Always points at a surrogate key, never at a natural key.
 - Should be enforced (logically, at minimum) so every fact row resolves to a
   valid dimension row — including the special "Unknown" member.
+
+How the fact obtains this value is described in
+[Key Assignment](../transformations/key-assignment.md).
 
 ```text
 fact_sales.customer_sk  -->  dim_customer.customer_sk
@@ -96,6 +100,8 @@ Classic examples: invoice number, order number, transaction id.
 - Useful for grouping the line items of a single operational document.
 - Stored as a column on the fact, often suffixed `_id` or `_number`.
 
+See [Degenerate dimensions](../patterns/degenerate-dimension.md).
+
 ```text
 fact_invoice_lines.invoice_number = "INV-2026-008812"
 ```
@@ -104,14 +110,18 @@ fact_invoice_lines.invoice_number = "INV-2026-008812"
 
 ## Special dimension members
 
-Reserve a handful of surrogate key values for rows that don't map to real source
-records, so that fact foreign keys never have to be `NULL`:
+Kimball recommends adding dedicated rows to a dimension for cases that don't map
+to real source records, so that fact foreign keys never have to be `NULL`.
+Typical members:
 
-| Surrogate key | Member meaning |
-|---------------|----------------|
-| `-1` | Unknown |
-| `-2` | Not applicable |
-| `-3` | Missing / not yet arrived |
+| Member                    | Meaning                                                        |
+| ------------------------- | -------------------------------------------------------------- |
+| Unknown                   | The relationship should exist, but the key could not be resolved |
+| Not applicable            | The relationship legitimately does not exist for this row      |
+| Missing / not yet arrived | See [Late-arriving members](../patterns/late-arriving.md)      |
+
+See [Unknown member](../patterns/unknown.md) for the definition and
+[Key Generation](../conventions/key-generation.md) for how their keys are produced.
 
 ---
 
@@ -121,16 +131,16 @@ records, so that fact foreign keys never have to be `NULL`:
 erDiagram
     dim_customer ||--o{ fact_sales : "customer_sk"
     dim_customer {
-        bigint customer_sk PK "surrogate key"
+        varchar customer_sk PK "surrogate key"
         bigint customer_durable_key "durable key"
         string customer_id "natural key"
         string customer_name "attribute"
         date valid_from_to "SCD2 validity + is_current"
     }
     fact_sales {
-        bigint customer_sk FK "to dim_customer"
-        bigint product_sk FK "to dim_product"
-        bigint date_sk FK "to dim_date"
+        varchar customer_sk FK "to dim_customer"
+        varchar product_sk FK "to dim_product"
+        varchar date_sk FK "to dim_date"
         string order_number "degenerate dimension"
         decimal quantity_amount "additive facts"
     }
