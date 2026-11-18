@@ -42,7 +42,7 @@ Every dimension referenced by a fact table should contain an unknown member.
 
 The unknown member should be added in the final dimension model as a predefined technical row, normally using `UNION ALL` with the regular dimension records. This ensures that the row is recreated consistently whenever the dimension is built or refreshed. Separate post-load inserts should be used only where the dimension loading strategy makes the union pattern impractical.
 
-Reserved members should follow the same surrogate key-generation approach as regular dimension members. 
+Reserved members should follow the same surrogate key-generation approach as regular dimension members.
 The surrogate key should therefore be generated from the reserved business code.
 
 For example:
@@ -115,7 +115,7 @@ SELECT
         u.customer_sk
     ) AS customer_sk,
     f.net_amount
-FROM staging.billing_items AS f
+FROM staging.stg_billing_items AS f
 LEFT JOIN dimensions.dim_customer AS d
     ON f.customer_number = d.customer_number
     AND f.source_system = d.source_system
@@ -227,4 +227,3 @@ Do not replace an unknown date with an arbitrary real date such as:
 unless that date is explicitly used as the documented unknown member.
 
 Using a real calendar date without clearly identifying it as technical can lead users to interpret it as an actual business date.
-

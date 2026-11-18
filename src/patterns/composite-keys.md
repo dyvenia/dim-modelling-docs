@@ -23,7 +23,7 @@ with_natural_key as (
         cost_effective_to,
         standard_unit_cost,
         plant_id || '|' || material_number || '|' || cost_effective_from as natural_key
-    FROM staging.standard_cost
+    FROM staging.stg_standard_cost
 )
 
 SELECT
@@ -83,7 +83,7 @@ SELECT
     material_number,
     invoice_date,
     sales_amount
-FROM staging.invoice_lines
+FROM staging.stg_invoice_lines
 ;
 ```
 
@@ -127,7 +127,7 @@ SELECT
     f.invoice_line_number,
     COALESCE(d.standard_cost_sk, unk.standard_cost_sk) as standard_cost_sk,
     f.sales_amount
-FROM staging.invoice_lines as f
+FROM staging.stg_invoice_lines as f
 LEFT JOIN dimensions.dim_standard_cost as d
     ON f.plant_id = d.plant_id
     AND f.material_number = d.material_number
