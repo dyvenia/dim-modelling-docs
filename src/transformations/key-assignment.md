@@ -57,7 +57,7 @@ unknown_<dim> AS (
 SELECT
     ...,
     COALESCE(d.<dim>_sk, na.<dim>_sk, unk.<dim>_sk) AS <dim>_sk
-FROM fact_<name> AS f
+FROM fct_<name> AS f
 LEFT JOIN dim_<dim> AS d
     ON d.<natural_key> = f.<natural_key>
 LEFT JOIN na_<dim> AS na
