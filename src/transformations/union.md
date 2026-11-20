@@ -15,9 +15,9 @@ flowchart LR
 
 ## Rules
 
-### Keep a `source_name` column
+### Keep a `source_system` column
 
-Every record must carry a `source_name` column identifying the system it came
+Every record must carry a `source_system` column identifying the system it came
 from. When rows from multiple sources are combined, this column preserves the
 lineage of each record so you can:
 
