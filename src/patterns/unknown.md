@@ -6,7 +6,7 @@ Instead of leaving the dimension key in the fact table as `NULL`, the fact point
 
 For example:
 
-| customer_sk                        | customer_number | customer_name    |
+| customer_sk                        | customer_id | customer_name    |
 | ---------------------------------- | --------------- | ---------------- |
 |          HASH('UNKNOWN', 'SYSTEM') | UNKNOWN         | Unknown Customer |
 |              HASH('C10001', 'SAP') | C10001          | Customer A       |
@@ -52,8 +52,8 @@ WITH
 
 dimension_data as (
     SELECT
-        HASH(customer_number, source_system) as customer_sk,
-        customer_number,
+        HASH(customer_id, source_system) as customer_sk,
+        customer_id,
         customer_name,
         source_system
     FROM source_data
@@ -62,14 +62,14 @@ dimension_data as (
 unknown_member as (
     SELECT
         HASH('UNKNOWN', 'SYSTEM') as customer_sk,
-        'UNKNOWN' as customer_number,
+        'UNKNOWN' as customer_id,
         'Unknown Customer' as customer_name,
         'SYSTEM' as source_system
 )
 
 SELECT
     customer_sk, 
-    customer_number, 
+    customer_id, 
     customer_name, 
     source_system 
 FROM unknown_member
@@ -78,7 +78,7 @@ UNION ALL
 
 SELECT
     customer_sk, 
-    customer_number, 
+    customer_id, 
     customer_name, 
     source_system 
 FROM dimension_data
@@ -101,7 +101,7 @@ WITH unknown_customer AS (
     SELECT
         customer_sk
     FROM dimensions.dim_customer
-    WHERE customer_number = 'UNKNOWN'
+    WHERE customer_id = 'UNKNOWN'
       AND source_system = 'SYSTEM'
 
 )
@@ -117,7 +117,7 @@ SELECT
     f.net_amount
 FROM staging.stg_billing_items AS f
 LEFT JOIN dimensions.dim_customer AS d
-    ON f.customer_number = d.customer_number
+    ON f.customer_id = d.customer_id
     AND f.source_system = d.source_system
 CROSS JOIN unknown_customer AS u
 ;
@@ -180,9 +180,9 @@ An unknown member in an SCD Type 2 dimension should normally be a permanent tech
 
 Example:
 
-| customer_sk                        | customer_number | valid_from | valid_to   | is_current |
+| customer_sk | customer_id | valid_from | valid_to | is_current |
 | ---------------------------------- | --------------- | ---------- | ---------- | ---------- |
-|          HASH('UNKNOWN', 'SYSTEM') | UNKNOWN         | 1900-01-01 | 9999-12-31 | 1          |
+| HASH('UNKNOWN', 'SYSTEM') | UNKNOWN | 1900-01-01 | 9999-12-31 | 1 |
 
 The unknown member:
 
