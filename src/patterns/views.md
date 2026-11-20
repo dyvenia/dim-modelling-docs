@@ -45,8 +45,8 @@ The modeling layer contains physical tables created as part of the dimensional m
 Examples:
 
 ```text
-facts.fact_billing_cogs
-facts.fact_bookings
+facts.fct_billing_cogs
+facts.fct_bookings
 dimensions.dim_calendar
 dimensions.dim_customer
 dimensions.dim_material
@@ -63,11 +63,11 @@ The access layer contains views that expose approved modeled data to users.
 Examples:
 
 ```text
-finance.fact_billing_cogs
+finance.fct_billing_cogs
 finance.dim_calendar
-finance_emea.fact_billing_cogs
-sales.fact_bookings
-sales_emea.fact_bookings
+finance_emea.fct_billing_cogs
+sales.fct_bookings
+sales_emea.fct_bookings
 ```
 
 The access layer is responsible for:
@@ -105,7 +105,7 @@ A secured view shouldn’t contain:
 Recommended pattern:
 
 ```sql
-create view finance_emea.fact_billing_cogs as
+create view finance_emea.fct_billing_cogs as
 
 SELECT
     f.billing_document_sk,
@@ -117,7 +117,7 @@ SELECT
     f.cogs_amount_doc,
     f.cogs_amount_lcy,
     f.cogs_amount_eur
-FROM facts.fact_billing_cogs f
+FROM facts.fct_billing_cogs f
 JOIN dimensions.dim_sales_organization o
     ON o.sales_organization_sk = f.sales_organization_sk
 WHERE o.region_code = 'EMEA';
@@ -155,11 +155,11 @@ operations_emea
 Example views:
 
 ```text
-finance.fact_billing_cogs
-finance.fact_bookings
+finance.fct_billing_cogs
+finance.fct_booking
 
-finance_emea.fact_billing_cogs
-finance_emea.fact_bookings
+finance_emea.fct_billing_cogs
+finance_emea.fct_booking
 ```
 
 In this approach:
@@ -174,13 +174,13 @@ This approach is easier for users to understand and easier to govern.
 A user can clearly see that:
 
 ```text
-finance.fact_billing_cogs
+finance.fct_billing_cogs
 ```
 
 means global finance access, while:
 
 ```text
-finance_emea.fact_billing_cogs
+finance_emea.fct_billing_cogs
 ```
 
 means finance data limited to EMEA.
@@ -209,9 +209,9 @@ Secured views should generally keep the same object name as the approved fact or
 Example:
 
 ```text
-facts.fact_billing_cogs
-finance.fact_billing_cogs
-finance_emea.fact_billing_cogs
+facts.fct_billing_cogs
+finance.fct_billing_cogs
+finance_emea.fct_billing_cogs
 ```
 
 If the access scope is already clear from the schema name, avoid repeating it in the view name.
@@ -219,13 +219,13 @@ If the access scope is already clear from the schema name, avoid repeating it in
 Preferred:
 
 ```text
-finance_emea.fact_billing_cogs
+finance_emea.fct_billing_cogs
 ```
 
 Less preferred:
 
 ```text
-finance.fact_billing_cogs_emea
+finance.fct_billing_cogs_emea
 ```
 
 ## Performance Considerations
@@ -235,15 +235,15 @@ Views do not physically duplicate data. A view is usually a stored query definit
 For example, a single modeled fact:
 
 ```text
-facts.fact_billing_cogs
+facts.fct_billing_cogs
 ```
 
 can be exposed through multiple secured views:
 
 ```text
-finance.fact_billing_cogs
-finance_emea.fact_billing_cogs
-finance_apac.fact_billing_cogs
+finance.fct_billing_cogs
+finance_emea.fct_billing_cogs
+finance_apac.fct_billing_cogs
 ```
 
 without physically duplicating the full fact table.
@@ -251,9 +251,9 @@ without physically duplicating the full fact table.
 This approach is preferable to creating separate filtered tables, such as:
 
 ```text
-facts.fact_billing_cogs_global
-facts.fact_billing_cogs_emea
-facts.fact_billing_cogs_apac
+facts.fct_billing_cogs_global
+facts.fct_billing_cogs_emea
+facts.fct_billing_cogs_apac
 ```
 
 unless there is a clear performance- or platform-specific reason to materialize them.
@@ -300,11 +300,11 @@ The access layer should be organized by business domain and, where needed, by ac
 Recommended example:
 
 ```text
-facts.fact_billing_cogs
+facts.fct_billing_cogs
 dimensions.dim_calendar
 
-finance.fact_billing_cogs
-finance_emea.fact_billing_cogs
+finance.fct_billing_cogs
+finance_emea.fct_billing_cogs
 finance.dim_calendar
 ```
 
