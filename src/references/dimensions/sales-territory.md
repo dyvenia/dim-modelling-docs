@@ -1,7 +1,7 @@
 # Sales Territory
 
 > **Type:** Dimension · **Primary home:** `dim_sales_territory` (SCD Type 2) ·
-> **Also surfaced on:** `fact_invoice_lines` (FK `sales_territory_sk`)
+> **Also surfaced on:** `fct_invoice_lines` (FK `sales_territory_sk`)
 
 ## Summary
 
@@ -43,7 +43,7 @@ L1  Global Sales
 ## Schema
 
 | Column | Type | Role | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `sales_territory_sk` | BIGINT | surrogate PK | one row per salesperson version |
 | `salesperson_id` | VARCHAR | natural key | source sales rep / district code |
 | `salesperson_name` | VARCHAR | attribute | leaf of the hierarchy |
@@ -64,7 +64,7 @@ L1  Global Sales
 A worked row for the example above:
 
 | Column | Value |
-|---|---|
+| --- | --- |
 | `salesperson_name` | Maria Rossi |
 | `territory_l5_name` | District 512 – Milan |
 | `territory_l4_name` | Northern Italy |
@@ -78,7 +78,7 @@ A worked row for the example above:
 CRM.SALES_REP        ──┐
 CRM.TERRITORY_TREE   ──┼──> stg_sales_territory ──> dim_sales_territory
 HR.REP_ASSIGNMENTS   ──┘                                │
-                                                        └──> fact_invoice_lines.sales_territory_sk (FK, resolved at load)
+                                                        └──> fct_invoice_lines.sales_territory_sk (FK, resolved at load)
 ```
 
 `TERRITORY_TREE` is a parent→child recursive table. The staging model walks it,
@@ -96,7 +96,7 @@ no bridge, no recursion:
 ```sql
 SELECT  st.territory_l2_name        AS area,
         SUM(s.net_amount)           AS net_sales
-FROM    fact_invoice_lines            s
+FROM    fct_invoice_lines            s
 JOIN    dim_sales_territory   st ON st.sales_territory_sk = s.sales_territory_sk
 GROUP BY st.territory_l2_name
 ORDER BY net_sales DESC;
@@ -115,7 +115,7 @@ WHERE   is_current
 
 ### Point-in-time: attribute each sale to the territory in effect *then*
 
-The ETL stamps each `fact_invoice_lines` row with the `sales_territory_sk` that was active
+The ETL stamps each `fct_invoice_lines` row with the `sales_territory_sk` that was active
 on the sale date, so this equi-join is automatically point-in-time correct — a
 sale stays with the rep's territory *at the time*, even after a later reorg:
 
@@ -123,30 +123,30 @@ sale stays with the rep's territory *at the time*, even after a later reorg:
 SELECT  st.territory_l3_name        AS country,
         DATE_TRUNC('quarter', s.sale_date) AS qtr,
         SUM(s.net_amount)           AS net_sales
-FROM    fact_invoice_lines            s
+FROM    fct_invoice_lines            s
 JOIN    dim_sales_territory   st ON st.sales_territory_sk = s.sales_territory_sk
 GROUP BY st.territory_l3_name, DATE_TRUNC('quarter', s.sale_date);
 ```
 
 ## Common Pitfalls
 
-- **Mind the level direction.** Level 1 = Global (root), level 5 = most granular.
-- **Salesperson ≠ person.** The leaf is a sales role/district. One human may cover
+* **Mind the level direction.** Level 1 = Global (root), level 5 = most granular.
+* **Salesperson ≠ person.** The leaf is a sales role/district. One human may cover
   several districts, and a district may pass between people over time. Keep this
   dimension at the territory-assignment grain; model the individual separately if
   HR attributes are needed.
-- **Unassigned reps.** New reps may book sales before territory setup. Point the
+* **Unassigned reps.** New reps may book sales before territory setup. Point the
   fact FK at a `-1` "Unknown territory" member (see
   [Kimball Keys Definitions](../../concepts/kimball-keys.md#special-dimension-members))
   rather than leaving the FK `NULL`.
 
 ## Related
 
-- [Kimball Keys Definitions](../../concepts/kimball-keys.md) — surrogate, durable,
+* [Kimball Keys Definitions](../../concepts/kimball-keys.md) — surrogate, durable,
   and natural keys plus the special "Unknown" member used above.
-- [Slowly Changing Dimension](../../definitions/slowly-changing-dimension.md) — the
+* [Slowly Changing Dimension](../../definitions/slowly-changing-dimension.md) — the
   SCD Type 2 pattern this dimension uses for reassignments.
-- `fact_invoice_lines` — primary consumer; carries `sales_territory_sk`.
+* `fct_invoice_lines` — primary consumer; carries `sales_territory_sk`.
 
 ## Change history / SCD
 

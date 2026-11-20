@@ -1,11 +1,11 @@
 # Invoice Lines
 
 > **Type:** Fact — transaction · **Grain:** one row per invoice line ·
-> **Primary home:** `fact_invoice_lines`
+> **Primary home:** `fct_invoice_lines`
 
 ## Summary
 
-`fact_invoice_lines` records the billed detail of customer invoices — one row for
+`fct_invoice_lines` records the billed detail of customer invoices — one row for
 each product line on each invoice. It is the backbone for revenue, discount, tax,
 and margin reporting, sliced by customer, product, date, and sales territory.
 
@@ -27,7 +27,7 @@ with no dimension table of their own); together they uniquely identify a row.
 ## Schema
 
 | Column | Type | Role | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `invoice_number` | VARCHAR | degenerate dimension | the operational invoice id |
 | `invoice_line_number` | INT | degenerate dimension | line position within the invoice |
 | `invoice_date_sk` | BIGINT | FK → `dim_date` | date the invoice was issued |
@@ -48,7 +48,7 @@ with no dimension table of their own); together they uniquely identify a row.
 ## Measures & additivity
 
 | Measure | Additivity | Notes |
-|---|---|---|
+| --- | --- | --- |
 | `quantity` | additive | sums across all dimensions |
 | `gross_amount`, `discount_amount`, `net_amount`, `tax_amount` | additive | the money measures; sum freely |
 | `standard_cost_of_sale` | additive | pairs with `net_amount` to give margin |
@@ -61,7 +61,7 @@ both inputs are additive, margin can be summed at any level.
 
 ```text
 ERP.INVOICE_HEADER ──┐
-ERP.INVOICE_LINE   ──┼──> stg_invoice_lines ──> fact_invoice_lines
+ERP.INVOICE_LINE   ──┼──> stg_invoice_lines ──> fct_invoice_lines
 ERP.FX_RATES       ──┘
 ```
 
@@ -78,7 +78,7 @@ was in effect when it was billed — point-in-time correct (see the pitfalls).
 SELECT  d.year_month,
         st.territory_l2_name          AS area,
         SUM(f.net_amount)             AS net_sales
-FROM    fact_invoice_lines   f
+FROM    fct_invoice_lines   f
 JOIN    dim_date             d  ON d.date_sk            = f.invoice_date_sk
 JOIN    dim_sales_territory  st ON st.sales_territory_sk = f.sales_territory_sk
 GROUP BY d.year_month, st.territory_l2_name;
@@ -91,7 +91,7 @@ SELECT  p.product_category,
         SUM(f.net_amount)                            AS net_sales,
         SUM(f.standard_cost_of_sale)                 AS standard_cost,
         SUM(f.net_amount - f.standard_cost_of_sale)  AS standard_margin
-FROM    fact_invoice_lines f
+FROM    fct_invoice_lines f
 JOIN    dim_product        p ON p.product_sk = f.product_sk
 GROUP BY p.product_category;
 ```
@@ -102,7 +102,7 @@ GROUP BY p.product_category;
 -- weighted average, NOT AVG(unit_price)
 SELECT  product_sk,
         SUM(net_amount) / NULLIF(SUM(quantity), 0) AS avg_unit_price
-FROM    fact_invoice_lines
+FROM    fct_invoice_lines
 GROUP BY product_sk;
 ```
 
@@ -143,7 +143,7 @@ GROUP BY product_sk;
 
 ## Change history / load pattern
 
-`fact_invoice_lines` is a **transaction-grain fact**, loaded **insert-only**: each
+`fct_invoice_lines` is a **transaction-grain fact**, loaded **insert-only**: each
 invoice line is written once and never updated. Corrections and returns flow in as
 new (often negative) lines rather than edits, preserving an auditable history.
 Late-arriving invoices are appended with their historical `invoice_date_sk`, and

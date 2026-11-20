@@ -7,9 +7,9 @@
 
 The **standard cost** is the predetermined, planned unit cost of a product, it typically includes these costs:
 
- * materials
- * labour
- * allocated overhead
+* materials
+* labour
+* allocated overhead
 
 Standard costs are calculated per material, typically during a periodic *cost roll* (often annually or quarterly). It is used for inventory valuation, margin reporting, and variance analysis against actual cost.
 
@@ -32,7 +32,7 @@ surrogate key.
 **One row per:** `plant_id` + `material_number` + cost version (effective period).
 
 | Column | Type | Role | Notes |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `standard_cost_sk` | BIGINT | surrogate PK | one row per plant + material + cost version |
 | `plant_id` | VARCHAR | natural key | ERP plant / costing location |
 | `material_number` | VARCHAR | natural key | ERP material (≈ product) |
@@ -83,7 +83,7 @@ SELECT  s.order_number,
         s.quantity * sc.standard_unit_cost            AS standard_cost_of_sale,
         s.extended_revenue
           - s.quantity * sc.standard_unit_cost        AS standard_margin
-FROM    fact_sales         s
+FROM    fct_sales         s
 JOIN    dim_standard_cost  sc
   ON    sc.standard_cost_sk = s.standard_cost_sk;     -- point-in-time resolved at load
 ```
@@ -96,7 +96,7 @@ was active when it happened — **never** to the current cost:
 ```sql
 SELECT  s.order_number,
         s.quantity * sc.standard_unit_cost AS standard_cost_of_sale
-FROM    fact_sales        s
+FROM    fct_sales        s
 JOIN    dim_standard_cost sc
   ON    sc.plant_id        = s.plant_id
  AND    sc.material_number = s.material_number
@@ -112,7 +112,7 @@ SELECT  p.plant_id,
         SUM(p.actual_unit_cost   * p.quantity)        AS actual_cost,
         SUM(sc.standard_unit_cost * p.quantity)       AS standard_cost,
         SUM((p.actual_unit_cost - sc.standard_unit_cost) * p.quantity) AS variance
-FROM    fact_purchase_receipts p
+FROM    fct_purchase_receipts p
 JOIN    dim_standard_cost      sc
   ON    sc.standard_cost_sk = p.standard_cost_sk
 GROUP BY p.plant_id, p.material_number;
@@ -120,43 +120,43 @@ GROUP BY p.plant_id, p.material_number;
 
 ## Common Pitfalls
 
-- **Standard cost is a dimension, not a fact — because its amounts are
+* **Standard cost is a dimension, not a fact — because its amounts are
   non-additive.** `standard_unit_cost` is a *per-unit rate*: summing it across
   products, plants, or periods is meaningless (`SUM(standard_unit_cost)` answers
   no real question). You **look it up and multiply** by a fact quantity
   (`quantity × standard_unit_cost`) to get an *additive* measure — the cost of
   sale — which belongs in the fact/query, not here. Modelling these rates as a
   fact table is what tempts that erroneous `SUM`.
-- **Always join point-in-time, never to the current cost.** Resolve the version
+* **Always join point-in-time, never to the current cost.** Resolve the version
   at ETL into `standard_cost_sk`, or range-join on the natural key + date (above).
   Using `dim_product.standard_cost` (the current value) to value historical sales
   silently restates past margins every time a cost roll runs.
-- **Use a half-open interval** `[from, to)` (`>= from AND < to`). Closed
+* **Use a half-open interval** `[from, to)` (`>= from AND < to`). Closed
   intervals (`BETWEEN`) double-count on the boundary day when one version ends
   and the next begins.
-- **`standard_cost` on `dim_product` is Type 1 (overwrite).** It exists only for
+* **`standard_cost` on `dim_product` is Type 1 (overwrite).** It exists only for
   convenience / current-state lookups. It carries no history — don't report
   trends from it.
-- **Currency and UoM are part of the cost.** Don't sum or compare
+* **Currency and UoM are part of the cost.** Don't sum or compare
   `standard_unit_cost` across rows with different `currency_code` or `uom_code`.
   Convert first.
-- **Standard ≠ actual ≠ average ≠ list price.** Keep cost *types* in separate,
+* **Standard ≠ actual ≠ average ≠ list price.** Keep cost *types* in separate,
   clearly named attributes. Mixing them is the single most common reporting error.
-- **Cost-roll timing.** A roll dated the 1st but loaded on the 5th leaves a 4-day
+* **Cost-roll timing.** A roll dated the 1st but loaded on the 5th leaves a 4-day
   gap if effective dating isn't backfilled. Validate that
   `max(cost_effective_to)` for the prior version meets `min(cost_effective_from)`
   of the next with no gap or overlap.
-- **Missing cost for a product.** New materials may sell before a standard cost is
+* **Missing cost for a product.** New materials may sell before a standard cost is
   rolled. Provide a `-1` "Unknown cost" member (see
   [Kimball Keys Definitions](../../concepts/kimball-keys.md#special-dimension-members))
   and a data-quality check, rather than producing `NULL` margins.
 
 ## Related
 
-- [Kimball Keys Definitions](../../concepts/kimball-keys.md) — natural, durable, and
+* [Kimball Keys Definitions](../../concepts/kimball-keys.md) — natural, durable, and
   surrogate keys used above.
-- `fact_sales`, `fact_purchase_receipts` — consumers; carry `standard_cost_sk`.
-- `dim_product` — carries the current-value convenience copy (Type 1).
+* `fct_sales`, `fct_purchase_receipts` — consumers; carry `standard_cost_sk`.
+* `dim_product` — carries the current-value convenience copy (Type 1).
 
 ## Change history / SCD
 

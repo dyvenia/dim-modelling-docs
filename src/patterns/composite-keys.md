@@ -70,7 +70,7 @@ grain = (invoice_number, invoice_line_number)
 
 Those two columns are [degenerate dimensions](https://dimensional-modelling.dyvenia.com/patterns/degenerate-dimension.html), and together they already identify the row. The fact needs nothing further to be uniquely addressable.
 
-Hashing that tuple into one column is therefore a **technical convenience, not a dimensional modelling requirement**. The resulting key never joins to a dimension; it exists so the load has a single column to merge, deduplicate and reconcile on, and so that re-running produces the same values. `fact_invoice_lines` does not keep one.
+Hashing that tuple into one column is therefore a **technical convenience, not a dimensional modelling requirement**. The resulting key never joins to a dimension; it exists so the load has a single column to merge, deduplicate and reconcile on, and so that re-running produces the same values. `fct_invoice_lines` does not keep one.
 
 Where a load does want one, it is built from the same tuple:
 
