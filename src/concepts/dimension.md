@@ -26,7 +26,7 @@ are the textual or low-cardinality attributes that describe it.
 
 ```mermaid
 erDiagram
-    dim_customer ||--o{ fact_invoice_lines : "customer_sk"
+    dim_customer ||--o{ fct_invoice_lines : "customer_sk"
     dim_customer {
         bigint customer_sk PK "surrogate key"
         string customer_id "natural key"

@@ -88,7 +88,7 @@ How the fact obtains this value is described in
 [Key Assignment](../transformations/key-assignment.md).
 
 ```text
-fact_sales.customer_sk  -->  dim_customer.customer_sk
+fct_sales.customer_sk  -->  dim_customer.customer_sk
 ```
 
 ## Degenerate dimension
@@ -103,7 +103,7 @@ Classic examples: invoice number, order number, transaction id.
 See [Degenerate dimensions](../patterns/degenerate-dimension.md).
 
 ```text
-fact_invoice_lines.invoice_number = "INV-2026-008812"
+fct_invoice_lines.invoice_number = "INV-2026-008812"
 ```
 
 ---
@@ -129,7 +129,7 @@ See [Unknown member](../patterns/unknown.md) for the definition and
 
 ```mermaid
 erDiagram
-    dim_customer ||--o{ fact_sales : "customer_sk"
+    dim_customer ||--o{ fct_sales : "customer_sk"
     dim_customer {
         varchar customer_sk PK "surrogate key"
         bigint customer_durable_key "durable key"
@@ -137,7 +137,7 @@ erDiagram
         string customer_name "attribute"
         date valid_from_to "SCD2 validity + is_current"
     }
-    fact_sales {
+    fct_sales {
         varchar customer_sk FK "to dim_customer"
         varchar product_sk FK "to dim_product"
         varchar date_sk FK "to dim_date"

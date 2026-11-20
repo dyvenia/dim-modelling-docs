@@ -8,7 +8,7 @@ or facts ("one row per order line", "one row per daily account balance"). Every
 dimension and measure on the table must be true at that grain; mixing grains in a
 single table is the most common dimensional modelling mistake.
 
-**Example:** `fact_sales` at the grain *one row per product per order line* — so
+**Example:** `fct_sales` at the grain *one row per product per order line* — so
 `quantity` and `extended_amount` are recorded per line, never per whole order.
 
 **See also:** [Standard Cost](../references/dimensions/standard-cost.md) (declares its grain as an explicit key tuple)

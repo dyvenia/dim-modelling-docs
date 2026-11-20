@@ -31,7 +31,7 @@ Geographic attributes sit directly inside `dim_customer`.
 
 ```mermaid
 erDiagram
-    dim_customer ||--o{ fact_sales : "places"
+    dim_customer ||--o{ fct_sales : "places"
 
     dim_customer {
         int customer_sk PK
@@ -42,7 +42,7 @@ erDiagram
         string postal_code
     }
 
-    fact_sales {
+    fct_sales {
         int customer_sk FK
         int quantity
         decimal amount
@@ -57,7 +57,7 @@ erDiagram
 %%{init: {'layoutDirection': 'LR'}}%%
 erDiagram
     dim_geography ||--o{ dim_customer : "located_in"
-    dim_customer ||--o{ fact_sales : "places"
+    dim_customer ||--o{ fct_sales : "places"
 
     dim_geography {
         int geography_sk PK
@@ -73,7 +73,7 @@ erDiagram
         int geography_sk FK
     }
 
-    fact_sales {
+    fct_sales {
         int customer_sk FK
         int quantity
         decimal amount

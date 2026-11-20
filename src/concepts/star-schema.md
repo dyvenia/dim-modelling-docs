@@ -8,11 +8,11 @@ This structure is optimized for analytical queries. Because every dimension join
 
 ```mermaid
 erDiagram
-    dim_sales_territory ||--o{ fact_invoice_lines : "sales_territory_sk"
-    dim_product_hierarchy ||--o{ fact_invoice_lines : "product_hierarchy_sk"
-    dim_industry ||--o{ fact_invoice_lines : "industry_sk"
+    dim_sales_territory ||--o{ fct_invoice_lines : "sales_territory_sk"
+    dim_product_hierarchy ||--o{ fct_invoice_lines : "product_hierarchy_sk"
+    dim_industry ||--o{ fct_invoice_lines : "industry_sk"
 
-    fact_invoice_lines {
+    fct_invoice_lines {
         string sales_territory_sk FK
         string product_hierarchy_sk FK
         string industry_sk FK
