@@ -134,4 +134,4 @@ Keeping resolution and key assignment as separate steps is what lets you check a
 
 - [Keys & Unknown member](https://dimensional-modelling.dyvenia.com/transformations/keys-assignments.html) — the surrogate-key step a `map_` feeds
 - [Prepare](https://dimensional-modelling.dyvenia.com/transformations/prepare.html) · [Join](https://dimensional-modelling.dyvenia.com/transformations/join.html) · [Union](https://dimensional-modelling.dyvenia.com/transformations/union.html) — the staging steps before resolution
-- [Naming conventions](https://dimensional-modelling.dyvenia.com/conventions/naming.html) — the `map_`, `vw_`, `_sk`, `_nk` prefixes
+- [Naming conventions](https://dimensional-modelling.dyvenia.com/conventions/naming.html) — the `map_`, `_sk`, `_nk` prefixes
