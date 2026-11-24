@@ -115,7 +115,7 @@ SELECT
         u.customer_sk
     ) AS customer_sk,
     f.net_amount
-FROM staging.billing_items AS f
+FROM staging.stg_billing_items AS f
 LEFT JOIN dimensions.dim_customer AS d
     ON f.customer_number = d.customer_number
     AND f.source_system = d.source_system
