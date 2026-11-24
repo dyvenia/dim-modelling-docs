@@ -29,7 +29,7 @@ erDiagram
     dim_customer ||--o{ fact_invoice_lines : "customer_sk"
     dim_customer {
         bigint customer_sk PK "surrogate key"
-        string customer_id "natural key"
+        string customer_number "natural key"
         string customer_name "attribute"
         string segment "attribute"
         string region "attribute"
@@ -39,7 +39,7 @@ erDiagram
 ## Natural Keys
 
 The **natural key** is the identifier the entity already carries in the **source
-system** — a `customer_id` from the CRM, an SKU from the product catalogue, an
+system** — a `customer_number` from the CRM, an SKU from the product catalogue, an
 order number from the OLTP database.
 
 - Carries business meaning and may be reused, recycled, or reformatted by the
@@ -51,7 +51,7 @@ order number from the OLTP database.
   to many historical versions of a row once you track history.
 
 ```text
-customer_id = "CUST-00417"
+customer_number = "CUST-00417"
 ```
 
 ## Surrogate Keys

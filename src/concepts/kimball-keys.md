@@ -21,7 +21,7 @@ and how facts obtain them in [Key Assignment](../transformations/key-assignment.
 ## Natural key
 
 The identifier an entity carries in the **source system** — for example a
-`customer_id` from the CRM, an SKU from the product catalogue, or an order number
+`customer_number` from the CRM, an SKU from the product catalogue, or an order number
 from the OLTP database.
 
 - Carries business meaning and may be reused or recycled by the source.
@@ -30,7 +30,7 @@ from the OLTP database.
   can map to many historical versions of a row (see surrogate keys).
 
 ```text
-customer_id = "CUST-00417"
+customer_number = "CUST-00417"
 ```
 
 ## Durable (supernatural) key
@@ -133,7 +133,7 @@ erDiagram
     dim_customer {
         varchar customer_sk PK "surrogate key"
         bigint customer_durable_key "durable key"
-        string customer_id "natural key"
+        string customer_number "natural key"
         string customer_name "attribute"
         date valid_from_to "SCD2 validity + is_current"
     }
@@ -148,4 +148,4 @@ erDiagram
 
 A fact row joins to a *specific version* of a customer via `customer_sk`. To
 analyse an entity across all its versions, group on `customer_durable_key`. To
-trace a record back to the source, use the `customer_id` natural key.
+trace a record back to the source, use the `customer_number` natural key.
