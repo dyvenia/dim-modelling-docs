@@ -45,7 +45,7 @@ The input to the hash is whatever makes one row of the table unique — its
   [Composite keys](../patterns/composite-keys.md).
 
 ```text
-customer_sk     = HASH(customer_id)                     -- no history
+customer_sk     = HASH(customer_number)                 -- no history
 company_sk      = HASH(company_code, valid_from)        -- SCD Type 2, one key per version
 invoice_line_sk = HASH(invoice_number, line_number)     -- fact's own key (optional)
 ```

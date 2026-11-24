@@ -4,7 +4,7 @@
 
 A late-arriving member is a dimension member whose details arrive **after** a fact that already references it.
 
-For example, an order fact arrives with `customer_id = 12345`, but the matching customer row hasn't reached the warehouse yet. The fact has a customer to point to, but the dimension member isn't there.
+For example, an order fact arrives with `customer_number = 12345`, but the matching customer row hasn't reached the warehouse yet. The fact has a customer to point to, but the dimension member isn't there.
 
 This is common when facts and dimensions come through separate pipelines, source systems run on different schedules, or data arrives out of order.
 
@@ -28,7 +28,7 @@ flowchart LR
     later[Dimension catches up] --> re[Next run resolves the fact normally]
 ```
 
-1. A fact arrives with a business key (`customer_id = 12345`).
+1. A fact arrives with a business key (`customer_number = 12345`).
 2. The member doesn't exist yet, so the fact resolves to the Unknown member and loads.
 3. The real customer data arrives in the dimension.
 4. The next run reprocesses that fact row, the join now succeeds, and the fact resolves to the real member.
