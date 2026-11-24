@@ -74,7 +74,7 @@ version has its own key. Match on the natural key **and** the event date:
 
 ```sql
 LEFT JOIN dim_customer AS d
-    ON d.customer_id = f.customer_id
+    ON d.customer_nk = f.customer_nk
     AND f.order_date >= d.valid_from
     AND f.order_date <  d.valid_to
 ```

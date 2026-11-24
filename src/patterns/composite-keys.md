@@ -94,7 +94,7 @@ One case does rule out trusting a single column: a transaction number that is **
 When two source systems can issue the same code for different entities, the source becomes part of the key:
 
 ```text
-customer_sk = HASH(source_system || '|' || customer_id)
+customer_sk = HASH(source_system || '|' || customer_number)
 ```
 
 Omitting `source_system` is the most common way to have unrelated source records resolve to the same key once a second source is onboarded. Nothing is wrong with the hash in that case: two different entities were handed identical input, so they correctly produce identical output. Kimball treats this as a first-class ETL responsibility, to be caught during key lookup rather than discovered downstream.
