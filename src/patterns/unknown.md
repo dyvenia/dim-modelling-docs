@@ -23,7 +23,6 @@ A fact record may fail to match a dimension for several reasons:
 * the dimension record has not been loaded yet
 * data arrives in a different order across pipelines
 * the source system contains inconsistent or incomplete master data
-* the relationship is not applicable for a specific record
 
 Using an unknown member allows the fact record to remain in the model while clearly indicating that the dimensional relationship could not be resolved.
 
@@ -33,6 +32,17 @@ This is generally preferable to:
 * leaving the foreign key as `NULL`
 * creating joins that require special `NULL` handling
 * silently assigning the record to an incorrect dimension member
+
+## Not applicable is a separate member
+
+Unknown means the relationship should exist, but the key could not be resolved. When the relationship does not apply to the record at all, the fact points to a second reserved member, **Not applicable**, with the reserved code `NOT_APPLICABLE`.
+
+| customer_sk                        | customer_number | customer_name    |
+| ---------------------------------- | --------------- | ---------------- |
+|          HASH('UNKNOWN', 'SYSTEM') | UNKNOWN         | Unknown Customer |
+|   HASH('NOT_APPLICABLE', 'SYSTEM') | NOT_APPLICABLE  | Not Applicable   |
+
+Keeping the two members apart lets a report tell a data problem (Unknown) from a normal case (Not applicable). Everything on this page about how the Unknown member is added, keyed and versioned applies to Not applicable too. The fact load checks Not applicable first, then Unknown: see [Key Assignment](../transformations/key-assignment.md).
 
 ## Standard rule
 
