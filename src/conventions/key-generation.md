@@ -65,13 +65,13 @@ same key:
 
 ### Keys of special members
 
-Unknown and Not applicable members are ordinary dimension rows. With sequence
-keys, they usually get fixed values such as `-1`. With hash keys, each of them
-gets a reserved **natural key value**, hashed the same way as any other row.
+Unknown and Not applicable members are ordinary dimension rows. Each of them
+gets a reserved **natural key value**, the same in every dimension, hashed the
+same way as any other row.
 
 ```text
-customer_sk (Unknown) = HASH('UNKNOWN')
-company_sk  (Unknown) = HASH('000')
+customer_sk (Unknown)        = HASH('UNKNOWN')
+customer_sk (Not applicable) = HASH('NOT_APPLICABLE')
 ```
 
 See [Unknown member](../patterns/unknown.md) for how these rows are defined.

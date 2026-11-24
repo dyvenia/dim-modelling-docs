@@ -207,15 +207,15 @@ A date dimension may also contain an unknown member.
 
 For example:
 
-| date_sk  | calendar_date | date_label   |
-| -------- | ------------- | ------------ |
-| 0        | NULL          | Unknown Date |
-| 20260713 | 2026-07-13    | 2026-07-13   |
+| date_sk            | calendar_date | date_label   |
+| ------------------ | ------------- | ------------ |
+| HASH('UNKNOWN')    | NULL          | Unknown Date |
+| HASH('2026-07-13') | 2026-07-13    | 2026-07-13   |
 
 If the source date is missing or invalid, the fact can use:
 
 ```text
-date_sk = 0
+date_sk = HASH('UNKNOWN')
 ```
 
 Do not replace an unknown date with an arbitrary real date such as:

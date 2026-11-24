@@ -49,10 +49,10 @@ nothing. See [Unknown member](../patterns/unknown.md).
 
 ```sql
 WITH na_<dim> AS (
-    SELECT <dim>_sk FROM dim_<dim> WHERE <natural_key> = '<na_code>'
+    SELECT <dim>_sk FROM dim_<dim> WHERE <natural_key> = 'NOT_APPLICABLE'
 ),
 unknown_<dim> AS (
-    SELECT <dim>_sk FROM dim_<dim> WHERE <natural_key> = '<unknown_code>'
+    SELECT <dim>_sk FROM dim_<dim> WHERE <natural_key> = 'UNKNOWN'
 )
 SELECT
     ...,

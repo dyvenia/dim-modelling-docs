@@ -125,7 +125,7 @@ GROUP BY product_sk;
   filter them out of margin.
 - **Currency.** Amounts are in `currency_code` (document currency). Convert to a
   single reporting currency before summing across currencies.
-- **Unknown members.** A line that can't resolve a dimension points at the `-1`
+- **Unknown members.** A line that can't resolve a dimension points at the
   "Unknown" member (see
   [Kimball Keys Definitions](../../concepts/kimball-keys.md#special-dimension-members)),
   never a `NULL` FK.
@@ -147,5 +147,5 @@ GROUP BY product_sk;
 invoice line is written once and never updated. Corrections and returns flow in as
 new (often negative) lines rather than edits, preserving an auditable history.
 Late-arriving invoices are appended with their historical `invoice_date_sk`, and
-their SCD Type 2 keys resolve to the version that was current then (or the `-1`
+their SCD Type 2 keys resolve to the version that was current then (or the
 Unknown member until the dimension member appears).

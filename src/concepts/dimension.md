@@ -64,7 +64,7 @@ dimension through it.
 - Typically a monotonically increasing `BIGINT` or identity column; carries no
   business meaning.
 - Decouples the warehouse from source-key changes and enables Type 2 history.
-- Reserve special values (e.g. `-1` Unknown, `-2` Not applicable) so fact foreign
+- Reserve special members (Unknown, Not applicable) so fact foreign
   keys never have to be `NULL`.
 
 > **Convention:** name surrogate keys `<entity>_sk`, e.g. `customer_sk`,

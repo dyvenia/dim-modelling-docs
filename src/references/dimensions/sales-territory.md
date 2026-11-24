@@ -136,7 +136,7 @@ GROUP BY st.territory_l3_name, DATE_TRUNC('quarter', s.sale_date);
   dimension at the territory-assignment grain; model the individual separately if
   HR attributes are needed.
 - **Unassigned reps.** New reps may book sales before territory setup. Point the
-  fact FK at a `-1` "Unknown territory" member (see
+  fact FK at the "Unknown territory" member (see
   [Kimball Keys Definitions](../../concepts/kimball-keys.md#special-dimension-members))
   rather than leaving the FK `NULL`.
 
