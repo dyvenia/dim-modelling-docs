@@ -147,7 +147,7 @@ GROUP BY p.plant_id, p.material_number;
   `max(cost_effective_to)` for the prior version meets `min(cost_effective_from)`
   of the next with no gap or overlap.
 - **Missing cost for a product.** New materials may sell before a standard cost is
-  rolled. Provide a `-1` "Unknown cost" member (see
+  rolled. Provide an "Unknown cost" member (see
   [Kimball Keys Definitions](../../concepts/kimball-keys.md#special-dimension-members))
   and a data-quality check, rather than producing `NULL` margins.
 

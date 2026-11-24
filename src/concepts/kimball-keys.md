@@ -118,10 +118,11 @@ Typical members:
 | ------------------------- | -------------------------------------------------------------- |
 | Unknown                   | The relationship should exist, but the key could not be resolved |
 | Not applicable            | The relationship legitimately does not exist for this row      |
-| Missing / not yet arrived | See [Late-arriving members](../patterns/late-arriving.md)      |
 
 See [Unknown member](../patterns/unknown.md) for the definition and
 [Key Generation](../conventions/key-generation.md) for how their keys are produced.
+A member that has not arrived yet rests on Unknown until it does; see
+[Late-arriving members](../patterns/late-arriving.md).
 
 ---
 
