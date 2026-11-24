@@ -33,7 +33,7 @@ surrogate key.
 
 | Column | Type | Role | Notes |
 |---|---|---|---|
-| `standard_cost_sk` | BIGINT | surrogate PK | one row per plant + material + cost version |
+| `standard_cost_sk` | VARCHAR | surrogate PK | one row per plant + material + cost version |
 | `plant_id` | VARCHAR | natural key | ERP plant / costing location |
 | `material_number` | VARCHAR | natural key | ERP material (≈ product) |
 | `cost_durable_key` | BIGINT | durable key | stable per (plant, material) across all versions |

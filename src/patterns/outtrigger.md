@@ -34,7 +34,7 @@ erDiagram
     dim_customer ||--o{ fact_sales : "places"
 
     dim_customer {
-        int customer_sk PK
+        varchar customer_sk PK
         string customer_name
         string city
         string state
@@ -43,7 +43,7 @@ erDiagram
     }
 
     fact_sales {
-        int customer_sk FK
+        varchar customer_sk FK
         int quantity
         decimal amount
     }
@@ -60,7 +60,7 @@ erDiagram
     dim_customer ||--o{ fact_sales : "places"
 
     dim_geography {
-        int geography_sk PK
+        varchar geography_sk PK
         string city
         string state
         string country
@@ -68,13 +68,13 @@ erDiagram
     }
 
     dim_customer {
-        int customer_sk PK
+        varchar customer_sk PK
         string customer_name
-        int geography_sk FK
+        varchar geography_sk FK
     }
 
     fact_sales {
-        int customer_sk FK
+        varchar customer_sk FK
         int quantity
         decimal amount
     }

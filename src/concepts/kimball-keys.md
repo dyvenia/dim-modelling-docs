@@ -53,7 +53,7 @@ A **meaningless, warehouse-generated** value that serves as the **primary key**
 of a dimension table. Every row in the dimension — including every historical
 version of an entity — gets its own surrogate key.
 
-- Can be a sequential integer or a deterministic hash; see
+- A deterministic hash of the columns that identify the row; see
   [Key Generation](../conventions/key-generation.md).
 - Carries no business meaning; never expose it to end users as a "real" id.
 - Decouples the warehouse from source-key changes and enables Type 2 history.
@@ -69,7 +69,7 @@ customer_sk = "3f2a9c..."   -- primary key of one specific version of a customer
 1. **Slowly changing dimensions (SCD Type 2).** When an attribute changes, a
    *new* row with a *new* surrogate key is added, preserving the old version.
 2. **Simpler joins.** A single-column key is easier to join on than a wide or
-   composite natural key. Kimball favours small integer keys for this reason.
+   composite natural key.
 3. **Insulation.** Source-system key changes don't ripple into facts.
 4. **Special members.** Dedicated rows can represent "Unknown" or
    "Not applicable".
