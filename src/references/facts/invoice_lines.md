@@ -30,11 +30,11 @@ with no dimension table of their own); together they uniquely identify a row.
 |---|---|---|---|
 | `invoice_number` | VARCHAR | degenerate dimension | the operational invoice id |
 | `invoice_line_number` | INT | degenerate dimension | line position within the invoice |
-| `invoice_date_sk` | BIGINT | FK → `dim_date` | date the invoice was issued |
-| `customer_sk` | BIGINT | FK → `dim_customer` | bill-to customer (version at invoice date) |
-| `product_sk` | BIGINT | FK → `dim_product` | product sold |
-| `sales_territory_sk` | BIGINT | FK → `dim_sales_territory` | rep / territory in effect at invoice date |
-| `standard_cost_sk` | BIGINT | FK → `dim_standard_cost` | standard-cost version in effect at invoice date |
+| `invoice_date_sk` | VARCHAR | FK → `dim_date` | date the invoice was issued |
+| `customer_sk` | VARCHAR | FK → `dim_customer` | bill-to customer (version at invoice date) |
+| `product_sk` | VARCHAR | FK → `dim_product` | product sold |
+| `sales_territory_sk` | VARCHAR | FK → `dim_sales_territory` | rep / territory in effect at invoice date |
+| `standard_cost_sk` | VARCHAR | FK → `dim_standard_cost` | standard-cost version in effect at invoice date |
 | `currency_code` | CHAR(3) | attribute | document currency (ISO 4217) |
 | `quantity` | DECIMAL(18,4) | measure | units invoiced; **additive** |
 | `gross_amount` | DECIMAL(18,4) | measure | list value before discount; **additive** |

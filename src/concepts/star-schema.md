@@ -13,26 +13,26 @@ erDiagram
     dim_industry ||--o{ fact_invoice_lines : "industry_sk"
 
     fact_invoice_lines {
-        string sales_territory_sk FK
-        string product_hierarchy_sk FK
-        string industry_sk FK
+        varchar sales_territory_sk FK
+        varchar product_hierarchy_sk FK
+        varchar industry_sk FK
         decimal quantity
         decimal amount
     }
     dim_sales_territory {
-        string sales_territory_sk PK
+        varchar sales_territory_sk PK
         string territory_code_nk
         string territory_name
         string region
     }
     dim_product_hierarchy {
-        string product_hierarchy_sk PK
+        varchar product_hierarchy_sk PK
         string product_code_nk
         string product_name
         string category
     }
     dim_industry {
-        string industry_sk PK
+        varchar industry_sk PK
         string industry_code_nk
         string industry_name
         string sector

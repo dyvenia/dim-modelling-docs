@@ -28,7 +28,7 @@ are the textual or low-cardinality attributes that describe it.
 erDiagram
     dim_customer ||--o{ fact_invoice_lines : "customer_sk"
     dim_customer {
-        bigint customer_sk PK "surrogate key"
+        varchar customer_sk PK "surrogate key"
         string customer_id "natural key"
         string customer_name "attribute"
         string segment "attribute"
@@ -56,13 +56,13 @@ customer_id = "CUST-00417"
 
 ## Surrogate Keys
 
-The **surrogate key** is a meaningless, warehouse-generated integer that serves as
+The **surrogate key** is a meaningless, warehouse-generated key that serves as
 the **primary key** of the dimension. Every row — including every historical
 version of an entity — gets its own surrogate key, and fact tables join to the
 dimension through it.
 
-- Typically a monotonically increasing `BIGINT` or identity column; carries no
-  business meaning.
+- A deterministic hash of the natural key, stored as `VARCHAR`; carries no
+  business meaning. See [Key Generation](../conventions/key-generation.md).
 - Decouples the warehouse from source-key changes and enables Type 2 history.
 - Reserve special values (e.g. `-1` Unknown, `-2` Not applicable) so fact foreign
   keys never have to be `NULL`.
@@ -71,7 +71,7 @@ dimension through it.
 > `product_sk`, `date_sk`.
 
 ```text
-customer_sk = 1048576   -- primary key of one specific version of a customer row
+customer_sk = "3f2a9c..."   -- primary key of one specific version of a customer row
 ```
 
 For the full set of key types and the conventions we use for each, see

@@ -13,9 +13,9 @@ Kimball recommends surrogate keys as **simple integers assigned in sequence**.
 This is a well-established approach, but it requires state: something has to
 remember the last value issued and which natural key received which number.
 
-An alternative is the **hash hybrid**: the key is a deterministic hash of the
-row's identifying columns, generated in the table that owns it. This is the
-recommended approach for pipelines that are rebuilt rather than updated in place.
+We use the **hash hybrid** instead: the key is a deterministic hash of the
+row's identifying columns, generated in the table that owns it. Every surrogate
+key in this guide is built this way.
 
 | Aspect               | Sequence / identity                        | Hash (recommended)                      |
 | -------------------- | ------------------------------------------ | --------------------------------------- |
@@ -55,9 +55,10 @@ invoice_line_sk = HASH(invoice_number, line_number)     -- fact's own key (optio
 A hash key is only as stable as its inputs. For the same row to always get the
 same key:
 
-- use **one shared hash function** for all keys;
-- keep the **same columns in the same order**, separated by a delimiter, with
-  `NULL` replaced by a fixed placeholder;
+- generate every key with **one shared macro** (for example
+  `dbt_utils.generate_surrogate_key`), which fixes the delimiter and the `NULL`
+  placeholder;
+- keep the **same columns in the same order**;
 - **standardise values before hashing** (data types, trimming, casing) in the
   [Prepare](../transformations/prepare.md) step, not inside the key expression;
 - treat a change to the inputs as a breaking change: every key of that table
@@ -80,8 +81,8 @@ See [Unknown member](../patterns/unknown.md) for how these rows are defined.
 
 - Each table generates its own surrogate key; facts resolve dimension keys by
   lookup (see [Key Assignment](../transformations/key-assignment.md)).
-- Kimball recommends sequential integers; a deterministic hash is the recommended
-  alternative because it needs no state and survives full rebuilds.
+- Kimball recommends sequential integers; we use a deterministic hash for every
+  key, because it needs no state and survives full rebuilds.
 - The hash input is the row's **grain**: the natural key for dimensions without
   history, the natural key plus a version identifier for SCD Type 2.
 - With hash keys, special members get their keys from a hashed reserved natural

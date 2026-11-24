@@ -48,7 +48,7 @@ Build the concatenation once, in a CTE, instead of repeating the expression. Tha
 
 The dimension owns the key. It is generated once, when the dimension row is built, and a fact never rebuilds it: the fact resolves the dimension row on the natural-key columns and takes the `_sk` from there, so key generation lives in exactly one model. That is the dimensional modelling principle, and it holds whatever the key is made of.
 
-How the key is made is our own convention. Kimball's canonical recommendation is a sequentially assigned integer; we hash the natural key instead, because it needs no central sequence generator and it is reproducible. Hashing does not mathematically guarantee uniqueness, so what the convention actually buys is determinism: the dimension produces the same key on every rebuild, and the foreign keys already written into facts stay valid.
+How the key is made is our own convention, set in [Key Generation](https://dimensional-modelling.dyvenia.com/conventions/key-generation.html): we hash the natural key, because it needs no central sequence generator and it is reproducible. Hashing does not mathematically guarantee uniqueness, so what the convention actually buys is determinism: the dimension produces the same key on every rebuild, and the foreign keys already written into facts stay valid.
 
 ## Where Composite Keys Appear
 

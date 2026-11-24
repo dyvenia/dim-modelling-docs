@@ -44,7 +44,7 @@ L1  Global Sales
 
 | Column | Type | Role | Notes |
 |---|---|---|---|
-| `sales_territory_sk` | BIGINT | surrogate PK | one row per salesperson version |
+| `sales_territory_sk` | VARCHAR | surrogate PK | one row per salesperson version |
 | `salesperson_id` | VARCHAR | natural key | source sales rep / district code |
 | `salesperson_name` | VARCHAR | attribute | leaf of the hierarchy |
 | `territory_l5_code` | VARCHAR | attribute | **level 5** — most granular territory (e.g. district) |
