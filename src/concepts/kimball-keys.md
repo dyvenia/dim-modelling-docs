@@ -98,7 +98,7 @@ interesting attributes of its own and therefore no separate dimension table.
 Classic examples: invoice number, order number, transaction id.
 
 - Useful for grouping the line items of a single operational document.
-- Stored as a column on the fact, often suffixed `_id` or `_number`.
+- Stored as a column on the fact with its business suffix, `_number` or `_code`.
 
 See [Degenerate dimensions](../patterns/degenerate-dimension.md).
 

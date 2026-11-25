@@ -45,7 +45,7 @@ L1  Global Sales
 | Column | Type | Role | Notes |
 |---|---|---|---|
 | `sales_territory_sk` | BIGINT | surrogate PK | one row per salesperson version |
-| `salesperson_id` | VARCHAR | natural key | source sales rep / district code |
+| `salesperson_code` | VARCHAR | natural key | source sales rep / district code |
 | `salesperson_name` | VARCHAR | attribute | leaf of the hierarchy |
 | `territory_l5_code` | VARCHAR | attribute | **level 5** — most granular territory (e.g. district) |
 | `territory_l5_name` | VARCHAR | attribute | |
@@ -110,7 +110,7 @@ SELECT  salesperson_name,
         territory_l2_name, territory_l1_name
 FROM    dim_sales_territory
 WHERE   is_current
-  AND   salesperson_id = 'REP-00417';
+  AND   salesperson_code = 'REP-00417';
 ```
 
 ### Point-in-time: attribute each sale to the territory in effect *then*
@@ -152,6 +152,6 @@ GROUP BY st.territory_l3_name, DATE_TRUNC('quarter', s.sale_date);
 
 `dim_sales_territory` is an **SCD Type 2 dimension**. Each territory reassignment
 closes the current row (`valid_to`, `is_current = false`) and inserts a new
-current row with a fresh `sales_territory_sk`; the `salesperson_id` natural key
+current row with a fresh `sales_territory_sk`; the `salesperson_code` natural key
 stays constant so all of a rep's history can be grouped together. Facts reference the
 version in effect at their transaction date via `sales_territory_sk`.

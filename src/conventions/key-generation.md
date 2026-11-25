@@ -93,4 +93,4 @@ See [Unknown member](../patterns/unknown.md) for how these rows are defined.
 - [Kimball Keys Definitions](../concepts/kimball-keys.md) — natural, surrogate, durable, and foreign keys
 - [Slowly Changing Dimensions](slowly-changing-dimension.md) — why SCD Type 2 keys are version-specific
 - [Unknown member](../patterns/unknown.md) — the reserved dimension row
-- [Naming](naming.md) — the `_sk` and `_nk` suffixes
+- [Naming](naming.md) — the `_sk` suffix

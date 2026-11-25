@@ -32,7 +32,7 @@ A separate dimension should not be created solely to assign a surrogate key to s
 For example, a billing item fact may contain:
 
 ```text
-billing_document_id
+billing_document_sk
 billing_document_number
 billing_document_item
 customer_sk
@@ -58,9 +58,9 @@ The dimension would largely duplicate identifiers already available in the fact 
 
 In this case, the transaction identifiers should remain directly in the fact.
 
-Where a technical identifier is required for a degenerate dimension, the recommended approach is to use a suffix such as `_id` rather than `_sk`.
+Where a technical identifier is required for a degenerate dimension, it is a surrogate key like any other generated key and takes the `_sk` suffix.
 
-The `_sk` suffix should be reserved for surrogate keys that reference dimension tables.
+The business identifier itself keeps its business suffix, such as `_number`.
 
 ## When to Use
 
@@ -107,7 +107,7 @@ A billing item fact may look as follows:
 ```text
 facts.fct_billing
 
-billing_document_id
+billing_document_sk
 billing_document_number
 billing_document_item
 billing_date_sk
@@ -130,7 +130,7 @@ Here:
 * `currency_sk` references the currency dimension.
 * `billing_document_number` is stored directly in the fact as a degenerate dimension.
 * `billing_document_item` identifies the individual transaction line and forms part of the natural fact grain.
-* `billing_document_id` may be used as a standardized technical identifier for the billing document where such an identifier is needed.
+* `billing_document_sk` may be used as a standardized technical identifier for the billing document where such an identifier is needed.
 
 The document identifier can then be used directly for analysis:
 
@@ -158,23 +158,23 @@ This allows the dimensional model to retain a direct connection to the source tr
 
 A degenerate dimension does not require a surrogate key because there is no separate dimension table to reference.
 
-Where a standardized technical identifier is useful, for example for uniqueness, joins between modeled objects, or consistent identification across processing steps, an `_id` column may be used.
+Where a standardized technical identifier is useful, for example for uniqueness, joins between modeled objects, or consistent identification across processing steps, an `_sk` column may be used.
 
 For example:
 
 ```text
-billing_document_id
+billing_document_sk
 billing_document_number
 ```
 
-`billing_document_id` may be generated from the business identifier using the standard key-generation approach.
+`billing_document_sk` may be generated from the business identifier using the standard key-generation approach.
 
 The recommended naming convention is:
 
-* `_sk` for surrogate keys referencing dimension tables
-* `_id` for technical identifiers that do not reference a dimension
+* `_sk` for every surrogate key, whether it references a dimension table or is generated in the fact
+* the business suffix (`_number`, `_code`) for the identifier itself
 
-This keeps the relationship between facts and dimensions explicit and avoids implying that every technical identifier has a corresponding dimension table.
+This keeps one suffix for every generated key and leaves the business identifier readable.
 
 ### Fact Grain
 
@@ -211,6 +211,6 @@ This does not automatically mean that a document-level dimension must be created
 * They are most appropriate when the identifier is useful but has no meaningful descriptive attributes of its own.
 * They are commonly used for document numbers such as invoices, orders, shipments, and purchase orders.
 * A separate dimension should not be created solely to hold the identifier and assign it a surrogate key.
-* `_sk` should be reserved for surrogate keys that reference dimension tables.
-* `_id` can be used for technical identifiers that do not reference a dimension.
+* `_sk` is used for every surrogate key, including a technical key generated in the fact.
+* The business identifier keeps its business suffix, such as `_number`.
 * Degenerate dimensions are a narrow exception and should not be used to place ordinary descriptive dimension attributes or measures directly in fact tables.
