@@ -100,7 +100,7 @@ WITH unknown_customer AS (
 
     SELECT
         customer_sk
-    FROM dimensions.dim_customer
+    FROM dim_customer
     WHERE customer_number = 'UNKNOWN'
       AND source_system = 'SYSTEM'
 
@@ -115,8 +115,8 @@ SELECT
         u.customer_sk
     ) AS customer_sk,
     f.net_amount
-FROM staging.stg_billing_items AS f
-LEFT JOIN dimensions.dim_customer AS d
+FROM stg_billing_items AS f
+LEFT JOIN dim_customer AS d
     ON f.customer_number = d.customer_number
     AND f.source_system = d.source_system
 CROSS JOIN unknown_customer AS u
@@ -157,8 +157,8 @@ Example query:
 SELECT
     d.customer_name,
     sum(f.net_amount) as net_amount
-FROM facts.fct_billing_item as f
-JOIN dimensions.dim_customer as d
+FROM fct_billing_item as f
+JOIN dim_customer as d
     ON f.customer_sk = d.customer_sk
 GROUP BY
     d.customer_name;

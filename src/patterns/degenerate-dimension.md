@@ -105,7 +105,7 @@ The degenerate dimension pattern should therefore remain a narrow exception for 
 A billing item fact may look as follows:
 
 ```text
-facts.fct_billing
+fct_billing
 
 billing_document_id
 billing_document_number
@@ -138,7 +138,7 @@ The document identifier can then be used directly for analysis:
 SELECT
     billing_document_number,
     SUM(net_value) AS net_value
-FROM facts.fct_billing
+FROM fct_billing
 GROUP BY billing_document_number;
 ```
 
@@ -146,7 +146,7 @@ It can also be used for validation or troubleshooting:
 
 ```sql
 SELECT *
-FROM facts.fct_billing
+FROM fct_billing
 WHERE billing_document_number = '0000123456';
 ```
 
