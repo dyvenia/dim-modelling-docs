@@ -17,18 +17,18 @@ WITH
 
 with_natural_key as (
     SELECT
-        plant_id,
+        plant_code,
         material_number,
         cost_effective_from,
         cost_effective_to,
         standard_unit_cost,
-        plant_id || '|' || material_number || '|' || cost_effective_from as natural_key
+        plant_code || '|' || material_number || '|' || cost_effective_from as natural_key
     FROM staging.stg_standard_cost
 )
 
 SELECT
     HASH(natural_key) as standard_cost_sk,
-    plant_id,
+    plant_code,
     material_number,
     cost_effective_from,
     cost_effective_to,
@@ -54,9 +54,9 @@ How the key is made is our own convention. Kimball's canonical recommendation is
 
 ### Dimensions With No Single Unique Identifier
 
-Many source entities are unique only across a tuple of columns. [Standard Cost](https://dimensional-modelling.dyvenia.com/references/dimensions/standard-cost.html) is the worked example in this guide — its natural key is `plant_id` + `material_number` + cost version, resolved to a single `standard_cost_sk`. Consumers join on that one column and never need to know it was built from three.
+Many source entities are unique only across a tuple of columns. [Standard Cost](https://dimensional-modelling.dyvenia.com/references/dimensions/standard-cost.html) is the worked example in this guide — its natural key is `plant_code` + `material_number` + cost version, resolved to a single `standard_cost_sk`. Consumers join on that one column and never need to know it was built from three.
 
-**Hashing the components does not mean discarding them.** Kimball notes that operational natural keys are often built from meaningful parts — a line of business, a country of origin, a plant — which should be exposed as dimension attributes in their own right. Keeping `plant_id` and `material_number` on the row is not redundancy: they are the natural key for traceability *and* attributes people group by.
+**Hashing the components does not mean discarding them.** Kimball notes that operational natural keys are often built from meaningful parts — a line of business, a country of origin, a plant — which should be exposed as dimension attributes in their own right. Keeping `plant_code` and `material_number` on the row is not redundancy: they are the natural key for traceability *and* attributes people group by.
 
 What must not happen is the reverse: **pushing the intelligence of the key onto its consumers.** Parsing a multipart code to filter the fact without joining the dimension bakes in assumptions — a length, a prefix, an embedded segment — that are business rules owned by someone else, and they will eventually be invalidated.
 
@@ -79,7 +79,7 @@ SELECT
     HASH(invoice_number || '|' || invoice_line_number) as invoice_line_sk,
     invoice_number,
     invoice_line_number,
-    plant_id,
+    plant_code,
     material_number,
     invoice_date,
     sales_amount
@@ -129,7 +129,7 @@ SELECT
     f.sales_amount
 FROM staging.stg_invoice_lines as f
 LEFT JOIN dimensions.dim_standard_cost as d
-    ON f.plant_id = d.plant_id
+    ON f.plant_code = d.plant_code
     AND f.material_number = d.material_number
     AND f.invoice_date >= d.cost_effective_from
     AND f.invoice_date < d.cost_effective_to
@@ -153,7 +153,7 @@ The join above does that resolution once and writes a single foreign key, so not
 
 A composite natural key has more moving parts than a single-column one, so it has more ways to change: a business rule change, a reorganisation, de-duplication, or the same entity arriving from a new system. When any component changes the hash changes, and the historical versions end up with unrelated surrogate keys and nothing tying them together.
 
-That is what a [durable key](https://dimensional-modelling.dyvenia.com/concepts/kimball-keys.html) is for, and it matters more here than for a simple key: the more components a natural key has, the more likely one of them is eventually reformatted or merged away. `dim_standard_cost` carries `cost_durable_key` alongside its per-version `standard_cost_sk` for exactly this reason.
+That is what a [durable key](https://dimensional-modelling.dyvenia.com/concepts/kimball-keys.html) is for, and it matters more here than for a simple key: the more components a natural key has, the more likely one of them is eventually reformatted or merged away. `dim_standard_cost` carries `standard_cost_durable_key` alongside its per-version `standard_cost_sk` for exactly this reason.
 
 ### Normalising Before Hashing
 

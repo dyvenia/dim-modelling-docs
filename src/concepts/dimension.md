@@ -45,7 +45,7 @@ order number from the OLTP database.
 - Carries business meaning and may be reused, recycled, or reformatted by the
   source.
 - Can be composite (several columns) and can change format over time.
-- Stored on the dimension (often suffixed `_nk`) so a row can be traced back to
+- Stored on the dimension under its business name so a row can be traced back to
   its source record.
 - **Not** used as the primary key of the dimension: a single natural key can map
   to many historical versions of a row once you track history.

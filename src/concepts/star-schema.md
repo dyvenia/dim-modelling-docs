@@ -21,19 +21,19 @@ erDiagram
     }
     dim_sales_territory {
         string sales_territory_sk PK
-        string territory_code_nk
+        string territory_code
         string territory_name
         string region
     }
     dim_product_hierarchy {
         string product_hierarchy_sk PK
-        string product_code_nk
+        string product_code
         string product_name
         string category
     }
     dim_industry {
         string industry_sk PK
-        string industry_code_nk
+        string industry_code
         string industry_name
         string sector
     }

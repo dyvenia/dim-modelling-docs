@@ -36,8 +36,8 @@ SELECT
     o.outlet_code,
     CASE WHEN LENGTH(o.outlet_code) = 5
          THEN o.outlet_code            -- store: use as-is
-         ELSE lead.cluster_store_nk    -- cluster: its lead store
-    END AS store_nk
+         ELSE lead.cluster_store_code    -- cluster: its lead store
+    END AS store_code
 FROM stg_outlets o
 LEFT JOIN map_cluster_lead lead
     ON lead.outlet_code = o.outlet_code;
@@ -45,7 +45,7 @@ LEFT JOIN map_cluster_lead lead
 
 One row per operational input, one clean key out:
 
-| outlet_code | store_nk |
+| outlet_code | store_code |
 |-------------|----------|
 | 10432       | 10432    |
 | 10433       | 10433    |
@@ -62,10 +62,10 @@ The code isn't unique on its own; it becomes unique only when combined with anot
 
 ```sql
 -- map_product
-SELECT c.catalogue_id, c.product_code, x.global_product_nk
+SELECT c.catalogue_code, c.product_code, x.global_product_code
 FROM stg_catalogue_lines c
 JOIN map_catalogue_crossref x
-    ON  x.catalogue_id = c.catalogue_id
+    ON  x.catalogue_code = c.catalogue_code
     AND x.product_code = c.product_code;
 ```
 
@@ -84,7 +84,7 @@ WITH RECURSIVE walk (node, ancestor) AS (
     FROM walk w
     JOIN stg_org_edges e ON e.child = w.ancestor
 )
-SELECT node, ancestor AS department_nk
+SELECT node, ancestor AS department_code
 FROM walk
 WHERE ancestor IN (SELECT dept_code FROM stg_departments);
 ```
@@ -111,8 +111,8 @@ SELECT
     COALESCE(d.store_sk, unk.store_sk) AS store_sk
 FROM stg_sales s
 LEFT JOIN map_outlet m ON m.outlet_code = s.outlet_code
-LEFT JOIN dim_store d  ON d.store_nk    = m.store_nk
-CROSS JOIN (SELECT store_sk FROM dim_store WHERE store_nk = 'UNKNOWN') unk;
+LEFT JOIN dim_store d  ON d.store_code    = m.store_code
+CROSS JOIN (SELECT store_sk FROM dim_store WHERE store_code = 'UNKNOWN') unk;
 ```
 
 Keeping resolution and key assignment as separate steps is what lets you check a resolution on its own, reuse it across many facts, and re-run the load without surprises. A fact that resolves codes inline puts these jobs back together and brings back every problem the `map_` was built to remove.

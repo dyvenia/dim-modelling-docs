@@ -23,20 +23,20 @@ Standard Cost is per unit of product, the natural key tends to be:
 * Material Number
 * Effective Date (period in which the cost is valid)
 
-In the warehouse this natural key maps to a `cost_durable_key` (stable per
+In the warehouse this natural key maps to a `standard_cost_durable_key` (stable per
 plant + material across every cost version) and a per-version `standard_cost_sk`
 surrogate key.
 
 ## Schema
 
-**One row per:** `plant_id` + `material_number` + cost version (effective period).
+**One row per:** `plant_code` + `material_number` + cost version (effective period).
 
 | Column | Type | Role | Notes |
 |---|---|---|---|
 | `standard_cost_sk` | BIGINT | surrogate PK | one row per plant + material + cost version |
-| `plant_id` | VARCHAR | natural key | ERP plant / costing location |
+| `plant_code` | VARCHAR | natural key | ERP plant / costing location |
 | `material_number` | VARCHAR | natural key | ERP material (≈ product) |
-| `cost_durable_key` | BIGINT | durable key | stable per (plant, material) across all versions |
+| `standard_cost_durable_key` | BIGINT | durable key | stable per (plant, material) across all versions |
 | `cost_effective_from` | DATE | natural key · validity | inclusive start of this cost version |
 | `cost_effective_to` | DATE | validity | exclusive end; `9999-12-31` while current |
 | `is_current` | BOOLEAN | validity | flag for the active version |
@@ -65,7 +65,7 @@ the new `standard_cost_sk`.
 ### Current standard cost of a product
 
 ```sql
-SELECT plant_id, material_number, standard_unit_cost, currency_code
+SELECT plant_code, material_number, standard_unit_cost, currency_code
 FROM   dim_standard_cost
 WHERE  is_current;
 ```
@@ -98,7 +98,7 @@ SELECT  s.order_number,
         s.quantity * sc.standard_unit_cost AS standard_cost_of_sale
 FROM    fact_sales        s
 JOIN    dim_standard_cost sc
-  ON    sc.plant_id        = s.plant_id
+  ON    sc.plant_code        = s.plant_code
  AND    sc.material_number = s.material_number
  AND    s.sale_date >= sc.cost_effective_from
  AND    s.sale_date <  sc.cost_effective_to;          -- half-open interval
@@ -107,7 +107,7 @@ JOIN    dim_standard_cost sc
 ### Purchase price / cost variance (standard vs actual)
 
 ```sql
-SELECT  p.plant_id,
+SELECT  p.plant_code,
         p.material_number,
         SUM(p.actual_unit_cost   * p.quantity)        AS actual_cost,
         SUM(sc.standard_unit_cost * p.quantity)       AS standard_cost,
@@ -115,7 +115,7 @@ SELECT  p.plant_id,
 FROM    fact_purchase_receipts p
 JOIN    dim_standard_cost      sc
   ON    sc.standard_cost_sk = p.standard_cost_sk
-GROUP BY p.plant_id, p.material_number;
+GROUP BY p.plant_code, p.material_number;
 ```
 
 ## Common Pitfalls
