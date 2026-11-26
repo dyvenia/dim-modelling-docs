@@ -142,7 +142,8 @@ erDiagram
         varchar product_sk FK "to dim_product"
         varchar date_sk FK "to dim_date"
         string order_number "degenerate dimension"
-        decimal quantity_amount "additive facts"
+        decimal quantity "additive fact"
+        decimal net_amount_doc "additive fact"
     }
 ```
 

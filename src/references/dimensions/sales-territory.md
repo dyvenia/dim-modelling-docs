@@ -95,11 +95,11 @@ no bridge, no recursion:
 
 ```sql
 SELECT  st.territory_l2_name        AS area,
-        SUM(s.net_amount)           AS net_sales
+        SUM(s.net_amount_eur)           AS net_sales_amount_eur
 FROM    fact_invoice_lines            s
 JOIN    dim_sales_territory   st ON st.sales_territory_sk = s.sales_territory_sk
 GROUP BY st.territory_l2_name
-ORDER BY net_sales DESC;
+ORDER BY net_sales_amount_eur DESC;
 ```
 
 ### The full territory chain for one salesperson
@@ -122,7 +122,7 @@ sale stays with the rep's territory *at the time*, even after a later reorg:
 ```sql
 SELECT  st.territory_l3_name        AS country,
         DATE_TRUNC('quarter', s.sale_date) AS qtr,
-        SUM(s.net_amount)           AS net_sales
+        SUM(s.net_amount_eur)           AS net_sales_amount_eur
 FROM    fact_invoice_lines            s
 JOIN    dim_sales_territory   st ON st.sales_territory_sk = s.sales_territory_sk
 GROUP BY st.territory_l3_name, DATE_TRUNC('quarter', s.sale_date);
