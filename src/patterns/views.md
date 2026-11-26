@@ -47,7 +47,7 @@ Examples:
 ```text
 facts.fct_billing_cogs
 facts.fct_bookings
-dimensions.dim_date
+dimensions.dim_calendar
 dimensions.dim_customer
 dimensions.dim_material
 ```
@@ -64,7 +64,7 @@ Examples:
 
 ```text
 finance.fct_billing_cogs
-finance.dim_date
+finance.dim_calendar
 finance_emea.fct_billing_cogs
 sales.fct_bookings
 sales_emea.fct_bookings
@@ -301,11 +301,11 @@ Recommended example:
 
 ```text
 facts.fct_billing_cogs
-dimensions.dim_date
+dimensions.dim_calendar
 
 finance.fct_billing_cogs
 finance_emea.fct_billing_cogs
-finance.dim_date
+finance.dim_calendar
 ```
 
 This approach keeps the model reusable, reduces data duplication, supports governance, and remains understandable for both technical and business users.
