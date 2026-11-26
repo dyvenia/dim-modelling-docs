@@ -13,6 +13,16 @@ the technique chosen for whether to keep or overwrite the prior values.
 - **Type 3** — keep a "previous value" column alongside the current one; limited
   history.
 
+**Validity columns:** every Type 2 dimension uses the same three columns:
+
+- `valid_from` — the first date the version is valid, **inclusive**.
+- `valid_to` — the date the version stops being valid, **exclusive**. It equals
+  the `valid_from` of the next version, and is `9999-12-31` while the version is
+  open.
+- `is_current` — true for the open version, false for the closed ones.
+
+A version applies to a date when `valid_from <= date AND date < valid_to`.
+
 **Example:** A customer moves city. Type 1 overwrites the city; Type 2 closes the
 old row (`valid_to`) and inserts a new current row, so historical facts still join
 to the address that was true at the time.

@@ -19,10 +19,10 @@ with_natural_key as (
     SELECT
         plant_id,
         material_number,
-        cost_effective_from,
-        cost_effective_to,
+        valid_from,
+        valid_to,
         standard_unit_cost,
-        plant_id || '|' || material_number || '|' || cost_effective_from as natural_key
+        plant_id || '|' || material_number || '|' || valid_from as natural_key
     FROM staging.stg_standard_cost
 )
 
@@ -30,8 +30,8 @@ SELECT
     HASH(natural_key) as standard_cost_sk,
     plant_id,
     material_number,
-    cost_effective_from,
-    cost_effective_to,
+    valid_from,
+    valid_to,
     standard_unit_cost
 FROM with_natural_key
 ;
@@ -131,8 +131,8 @@ FROM staging.stg_invoice_lines as f
 LEFT JOIN dimensions.dim_standard_cost as d
     ON f.plant_id = d.plant_id
     AND f.material_number = d.material_number
-    AND f.invoice_date >= d.cost_effective_from
-    AND f.invoice_date < d.cost_effective_to
+    AND f.invoice_date >= d.valid_from
+    AND f.invoice_date < d.valid_to
 CROSS JOIN unknown_member as unk
 ;
 ```
@@ -145,7 +145,7 @@ This substitution is the **surrogate key assignment step**, and it has one order
 
 ### Validity Dates in the Key
 
-Where a version discriminator such as `cost_effective_from` is part of the natural key, it must be resolved during the load and never left to consumers. Kimball warns against gluing a natural key to a timestamp and then expecting consumers to match an event date against a validity range at query time; his term for the result is a *double-barreled join*.
+Where a version discriminator such as `valid_from` is part of the natural key, it must be resolved during the load and never left to consumers. Kimball warns against gluing a natural key to a timestamp and then expecting consumers to match an event date against a validity range at query time; his term for the result is a *double-barreled join*.
 
 The join above does that resolution once and writes a single foreign key, so nothing downstream knows a validity range was involved. [Standard Cost](https://dimensional-modelling.dyvenia.com/references/dimensions/standard-cost.html) covers the mechanics of the range join itself, including why the interval must be half-open.
 

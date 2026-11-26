@@ -182,7 +182,7 @@ Example:
 
 | customer_sk                        | customer_number | valid_from | valid_to   | is_current |
 | ---------------------------------- | --------------- | ---------- | ---------- | ---------- |
-|          HASH('UNKNOWN', 'SYSTEM') | UNKNOWN         | 1900-01-01 | 9999-12-31 | 1          |
+|          HASH('UNKNOWN', 'SYSTEM') | UNKNOWN         | 1900-01-01 | 9999-12-31 | true       |
 
 The unknown member:
 

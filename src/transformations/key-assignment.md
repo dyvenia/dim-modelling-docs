@@ -79,10 +79,9 @@ LEFT JOIN dim_customer AS d
     AND f.order_date <  d.valid_to
 ```
 
-> **Note:** the comparison must match how validity periods are defined. The
-> example assumes `valid_to` is exclusive (equal to the next version's
-> `valid_from`). If `valid_to` is inclusive (the day before the next version
-> starts), use `<= d.valid_to` instead.
+> **Note:** `valid_to` is exclusive, equal to the next version's `valid_from`,
+> so the comparison is `<`. See
+> [Slowly Changing Dimension](../conventions/slowly-changing-dimension.md).
 
 Versions should not overlap (fan-out), leave gaps, or have `NULL` validity dates
 (false Unknowns).

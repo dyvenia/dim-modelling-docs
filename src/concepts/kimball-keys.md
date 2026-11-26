@@ -135,7 +135,9 @@ erDiagram
         bigint customer_durable_key "durable key"
         string customer_id "natural key"
         string customer_name "attribute"
-        date valid_from_to "SCD2 validity + is_current"
+        date valid_from "SCD2 validity, inclusive"
+        date valid_to "SCD2 validity, exclusive"
+        boolean is_current "open version flag"
     }
     fact_sales {
         varchar customer_sk FK "to dim_customer"
