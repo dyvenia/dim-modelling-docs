@@ -37,10 +37,11 @@ with no dimension table of their own); together they uniquely identify a row.
 | `standard_cost_sk` | BIGINT | FK → `dim_standard_cost` | standard-cost version in effect at invoice date |
 | `currency_code` | CHAR(3) | attribute | document currency (ISO 4217) |
 | `quantity` | DECIMAL(18,4) | measure | units invoiced; **additive** |
-| `gross_amount` | DECIMAL(18,4) | measure | list value before discount; **additive** |
-| `discount_amount` | DECIMAL(18,4) | measure | **additive** |
-| `net_amount` | DECIMAL(18,4) | measure | = gross − discount; **additive** |
-| `tax_amount` | DECIMAL(18,4) | measure | **additive** |
+| `gross_amount_doc` | DECIMAL(18,4) | measure | list value before discount; **additive** |
+| `discount_amount_doc` | DECIMAL(18,4) | measure | **additive** |
+| `net_amount_doc` | DECIMAL(18,4) | measure | = gross − discount; **additive** |
+| `tax_amount_doc` | DECIMAL(18,4) | measure | **additive** |
+| `net_amount_eur` | DECIMAL(18,4) | measure | `net_amount_doc` converted to EUR at the invoice date rate; **additive** |
 | `standard_cost_of_sale` | DECIMAL(18,4) | measure | = `quantity × standard_unit_cost`; **additive** |
 | `unit_price` | DECIMAL(18,4) | measure | net per unit; **non-additive** (a rate) |
 | `load_ts` | TIMESTAMP | audit | warehouse load timestamp |
@@ -50,11 +51,12 @@ with no dimension table of their own); together they uniquely identify a row.
 | Measure | Additivity | Notes |
 |---|---|---|
 | `quantity` | additive | sums across all dimensions |
-| `gross_amount`, `discount_amount`, `net_amount`, `tax_amount` | additive | the money measures; sum freely |
-| `standard_cost_of_sale` | additive | pairs with `net_amount` to give margin |
-| `unit_price` | **non-additive** | a per-unit rate — never `SUM`; for an average use `SUM(net_amount) / SUM(quantity)` |
+| `gross_amount_doc`, `discount_amount_doc`, `net_amount_doc`, `tax_amount_doc` | additive | document currency; sum only within one `currency_code` |
+| `net_amount_eur` | additive | reporting currency; sum freely |
+| `standard_cost_of_sale` | additive | pairs with `net_amount_eur` to give margin |
+| `unit_price` | **non-additive** | a per-unit rate — never `SUM`; for an average use `SUM(net_amount_eur) / SUM(quantity)` |
 
-Margin is **derived, not stored**: `net_amount − standard_cost_of_sale`. Because
+Margin is **derived, not stored**: `net_amount_eur − standard_cost_of_sale`. Because
 both inputs are additive, margin can be summed at any level.
 
 ## Source & lineage
@@ -77,7 +79,7 @@ was in effect when it was billed — point-in-time correct (see the pitfalls).
 ```sql
 SELECT  d.year_month,
         st.territory_l2_name          AS area,
-        SUM(f.net_amount)             AS net_sales
+        SUM(f.net_amount_eur)             AS net_sales_amount_eur
 FROM    fact_invoice_lines   f
 JOIN    dim_date             d  ON d.date_sk            = f.invoice_date_sk
 JOIN    dim_sales_territory  st ON st.sales_territory_sk = f.sales_territory_sk
@@ -88,9 +90,9 @@ GROUP BY d.year_month, st.territory_l2_name;
 
 ```sql
 SELECT  p.product_category,
-        SUM(f.net_amount)                            AS net_sales,
+        SUM(f.net_amount_eur)                            AS net_sales_amount_eur,
         SUM(f.standard_cost_of_sale)                 AS standard_cost,
-        SUM(f.net_amount - f.standard_cost_of_sale)  AS standard_margin
+        SUM(f.net_amount_eur - f.standard_cost_of_sale)  AS standard_margin
 FROM    fact_invoice_lines f
 JOIN    dim_product        p ON p.product_sk = f.product_sk
 GROUP BY p.product_category;
@@ -101,7 +103,7 @@ GROUP BY p.product_category;
 ```sql
 -- weighted average, NOT AVG(unit_price)
 SELECT  product_sk,
-        SUM(net_amount) / NULLIF(SUM(quantity), 0) AS avg_unit_price
+        SUM(net_amount_eur) / NULLIF(SUM(quantity), 0) AS avg_unit_price
 FROM    fact_invoice_lines
 GROUP BY product_sk;
 ```
@@ -109,7 +111,7 @@ GROUP BY product_sk;
 ## Common Pitfalls
 
 - **Never `SUM(unit_price)`** (or `AVG` it). It is a per-unit rate — non-additive.
-  Compute an average as `SUM(net_amount) / SUM(quantity)`.
+  Compute an average as `SUM(net_amount_eur) / SUM(quantity)`.
 - **Header vs line grain.** Whole-invoice charges (freight, invoice-level
   discounts) belong to the header, not each line. Repeating them per line
   double-counts — allocate them to lines or keep a separate header fact.
@@ -123,8 +125,8 @@ GROUP BY product_sk;
 - **Returns & credit notes.** Credits arrive as negative `quantity` / amounts.
   Keep the sign convention consistent so `SUM` nets correctly; don't silently
   filter them out of margin.
-- **Currency.** Amounts are in `currency_code` (document currency). Convert to a
-  single reporting currency before summing across currencies.
+- **Currency.** The `_doc` amounts are in `currency_code` (document currency). Sum
+  them only within one currency; across currencies use `net_amount_eur`.
 - **Unknown members.** A line that can't resolve a dimension points at the `-1`
   "Unknown" member (see
   [Kimball Keys Definitions](../../concepts/kimball-keys.md#special-dimension-members)),

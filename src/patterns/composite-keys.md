@@ -82,7 +82,7 @@ SELECT
     plant_id,
     material_number,
     invoice_date,
-    sales_amount
+    sales_amount_doc
 FROM staging.stg_invoice_lines
 ;
 ```
@@ -126,7 +126,7 @@ SELECT
     f.invoice_number,
     f.invoice_line_number,
     COALESCE(d.standard_cost_sk, unk.standard_cost_sk) as standard_cost_sk,
-    f.sales_amount
+    f.sales_amount_doc
 FROM staging.stg_invoice_lines as f
 LEFT JOIN dimensions.dim_standard_cost as d
     ON f.plant_id = d.plant_id

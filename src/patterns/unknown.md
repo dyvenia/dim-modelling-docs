@@ -114,7 +114,7 @@ SELECT
         d.customer_sk,
         u.customer_sk
     ) AS customer_sk,
-    f.net_amount
+    f.net_amount_doc
 FROM staging.stg_billing_items AS f
 LEFT JOIN dimensions.dim_customer AS d
     ON f.customer_number = d.customer_number
@@ -156,7 +156,7 @@ Example query:
 ```sql
 SELECT
     d.customer_name,
-    sum(f.net_amount) as net_amount
+    sum(f.net_amount_eur) as net_amount_eur
 FROM facts.fct_billing_item as f
 JOIN dimensions.dim_customer as d
     ON f.customer_sk = d.customer_sk

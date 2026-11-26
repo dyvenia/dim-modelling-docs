@@ -115,7 +115,7 @@ SELECT
     f.sales_organization_sk,
     f.document_currency_sk,
     f.cogs_amount_doc,
-    f.cogs_amount_lcy,
+    f.cogs_amount_lc,
     f.cogs_amount_eur
 FROM facts.fct_billing_cogs f
 JOIN dimensions.dim_sales_organization o
@@ -123,7 +123,7 @@ JOIN dimensions.dim_sales_organization o
 WHERE o.region_code = 'EMEA';
 ```
 
-The view should make the access scope clear, but the calculation of `cogs_amount_doc`, `cogs_amount_lcy`, or `cogs_amount_eur` should already happen in the modeled fact table.
+The view should make the access scope clear, but the calculation of `cogs_amount_doc`, `cogs_amount_lc`, or `cogs_amount_eur` should already happen in the modeled fact table.
 
 The selected columns should follow the agreed fact design. The fact structure itself is defined in the fact modeling documentation.
 

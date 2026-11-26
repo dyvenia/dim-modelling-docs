@@ -39,7 +39,7 @@ customer_sk
 material_sk
 billing_date_sk
 quantity
-net_value
+net_amount_doc
 ```
 
 If a separate dimension were created only to represent the billing document and item identifiers:
@@ -115,7 +115,7 @@ customer_sk
 material_sk
 currency_sk
 quantity
-net_value
+net_amount_doc
 ```
 
 The fact grain may be defined as:
@@ -137,7 +137,7 @@ The document identifier can then be used directly for analysis:
 ```sql
 SELECT
     billing_document_number,
-    SUM(net_value) AS net_value
+    SUM(net_amount_doc) AS net_amount_doc
 FROM facts.fct_billing
 GROUP BY billing_document_number;
 ```
