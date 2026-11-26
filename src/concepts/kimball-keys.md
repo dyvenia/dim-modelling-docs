@@ -140,7 +140,7 @@ erDiagram
     fact_sales {
         varchar customer_sk FK "to dim_customer"
         varchar product_sk FK "to dim_product"
-        varchar date_sk FK "to dim_date"
+        varchar date_sk FK "to dim_calendar"
         string order_number "degenerate dimension"
         decimal quantity_amount "additive facts"
     }
