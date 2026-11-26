@@ -37,8 +37,8 @@ surrogate key.
 | `plant_id` | VARCHAR | natural key | ERP plant / costing location |
 | `material_number` | VARCHAR | natural key | ERP material (≈ product) |
 | `cost_durable_key` | BIGINT | durable key | stable per (plant, material) across all versions |
-| `cost_effective_from` | DATE | natural key · validity | inclusive start of this cost version |
-| `cost_effective_to` | DATE | validity | exclusive end; `9999-12-31` while current |
+| `valid_from` | DATE | natural key · validity | inclusive start of this cost version |
+| `valid_to` | DATE | validity | exclusive end; `9999-12-31` while current |
 | `is_current` | BOOLEAN | validity | flag for the active version |
 | `material_cost` | DECIMAL(18,4) | attribute (rate) | per-unit component; **non-additive** |
 | `labour_cost` | DECIMAL(18,4) | attribute (rate) | per-unit component; **non-additive** |
@@ -57,7 +57,7 @@ ERP.COST_PERIODS ──┘                              │
 ```
 
 The cost roll job lands a new effective period; the staging model derives
-`standard_unit_cost`, closes the prior period's `cost_effective_to`, and assigns
+`standard_unit_cost`, closes the prior period's `valid_to`, and assigns
 the new `standard_cost_sk`.
 
 ## How to use it
@@ -100,8 +100,8 @@ FROM    fact_sales        s
 JOIN    dim_standard_cost sc
   ON    sc.plant_id        = s.plant_id
  AND    sc.material_number = s.material_number
- AND    s.sale_date >= sc.cost_effective_from
- AND    s.sale_date <  sc.cost_effective_to;          -- half-open interval
+ AND    s.sale_date >= sc.valid_from
+ AND    s.sale_date <  sc.valid_to;          -- half-open interval
 ```
 
 ### Purchase price / cost variance (standard vs actual)
@@ -144,7 +144,7 @@ GROUP BY p.plant_id, p.material_number;
   clearly named attributes. Mixing them is the single most common reporting error.
 - **Cost-roll timing.** A roll dated the 1st but loaded on the 5th leaves a 4-day
   gap if effective dating isn't backfilled. Validate that
-  `max(cost_effective_to)` for the prior version meets `min(cost_effective_from)`
+  `max(valid_to)` for the prior version meets `min(valid_from)`
   of the next with no gap or overlap.
 - **Missing cost for a product.** New materials may sell before a standard cost is
   rolled. Provide a `-1` "Unknown cost" member (see
@@ -161,7 +161,7 @@ GROUP BY p.plant_id, p.material_number;
 ## Change history / SCD
 
 `dim_standard_cost` is an **SCD Type 2 dimension** with effective dating. Each
-cost roll closes the current row (`cost_effective_to`, `is_current = false`) and
+cost roll closes the current row (`valid_to`, `is_current = false`) and
 inserts a new current row with a fresh `standard_cost_sk`. Facts reference the
 version in effect at their transaction date via that `standard_cost_sk`. The
 `dim_product.standard_cost` convenience copy is **Type 1** (overwrite, no history).
