@@ -30,7 +30,7 @@ with no dimension table of their own); together they uniquely identify a row.
 |---|---|---|---|
 | `invoice_number` | VARCHAR | degenerate dimension | the operational invoice id |
 | `invoice_line_number` | INT | degenerate dimension | line position within the invoice |
-| `invoice_date_sk` | BIGINT | FK → `dim_date` | date the invoice was issued |
+| `invoice_date_sk` | BIGINT | FK → `dim_calendar` | date the invoice was issued |
 | `customer_sk` | BIGINT | FK → `dim_customer` | bill-to customer (version at invoice date) |
 | `product_sk` | BIGINT | FK → `dim_product` | product sold |
 | `sales_territory_sk` | BIGINT | FK → `dim_sales_territory` | rep / territory in effect at invoice date |
@@ -79,7 +79,7 @@ SELECT  d.year_month,
         st.territory_l2_name          AS area,
         SUM(f.net_amount)             AS net_sales
 FROM    fact_invoice_lines   f
-JOIN    dim_date             d  ON d.date_sk            = f.invoice_date_sk
+JOIN    dim_calendar             d  ON d.date_sk            = f.invoice_date_sk
 JOIN    dim_sales_territory  st ON st.sales_territory_sk = f.sales_territory_sk
 GROUP BY d.year_month, st.territory_l2_name;
 ```
@@ -139,7 +139,7 @@ GROUP BY product_sk;
 - [Grain](../../definitions/grain.md) and
   [Kimball Keys Definitions](../../concepts/kimball-keys.md) — the concepts this fact
   builds on.
-- `dim_date`, `dim_customer`, `dim_product` — the remaining conformed dimensions.
+- `dim_calendar`, `dim_customer`, `dim_product` — the remaining conformed dimensions.
 
 ## Change history / load pattern
 
